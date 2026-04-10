@@ -43,11 +43,11 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
     updateProfile(parsed);
     markFormSubmitted(messageId);
     completeStep(activeStep);
-    addTerminalLog('[Data] 用户资料已更新。正在搜索适用的福利项目...');
+    addTerminalLog('[Data] User profile updated. Searching applicable welfare programs...');
 
     // Now search for welfare programs using Exa
     try {
-      addTerminalLog('[Exa] 正在搜索香港福利资源...');
+      addTerminalLog('[Exa] Searching HK welfare resources...');
 
       // Determine search queries based on user profile
       const updatedProfile = { ...userProfile, ...parsed };
@@ -56,7 +56,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
       const allCards: WelfareCard[] = [];
 
       for (const query of searchQueries) {
-        addTerminalLog(`[Exa] 搜索: "${query.name}"...`);
+        addTerminalLog(`[Exa] Searching: "${query.name}"...`);
         const resources = await searchWelfareResources(query.name);
         allCards.push({
           id: query.id,
@@ -75,7 +75,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
           id: Date.now().toString(),
           role: 'agent',
           type: 'text',
-          content: '根据您提供的信息，以下是您可能符合资格的福利项目。点击卡片即可开始申请流程：',
+          content: 'Based on your information, here are the welfare programs you may be eligible for. Click on a card to begin the application process:',
           timestamp: new Date(),
         };
         addChatMessage(introMsg);
@@ -88,25 +88,25 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
           timestamp: new Date(),
         };
         addChatMessage(cardsMsg);
-        addTerminalLog(`[Exa] 找到 ${allCards.length} 个适用福利项目。`);
+        addTerminalLog(`[Exa] Found ${allCards.length} applicable welfare programs.`);
       } else {
         const fallbackMsg: ChatMessage = {
           id: Date.now().toString(),
           role: 'agent',
           type: 'text',
-          content: '感谢您的信息。我正在为您匹配适合的福利项目，请稍后再试。',
+          content: 'Thank you for your information. I am matching suitable welfare programs for you, please try again later.',
           timestamp: new Date(),
         };
         addChatMessage(fallbackMsg);
       }
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      addTerminalLog(`[Error] Exa 搜索失败: ${errMsg}`);
+      addTerminalLog(`[Error] Exa search failed: ${errMsg}`);
       const fallback: ChatMessage = {
         id: Date.now().toString(),
         role: 'agent',
         type: 'text',
-        content: '感谢您提供的信息。搜索暂时出现问题，请稍后再试。',
+        content: 'Thank you for your information. Search encountered an issue, please try again later.',
         timestamp: new Date(),
       };
       addChatMessage(fallback);
@@ -139,11 +139,11 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> 搜索福利项目中...
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching welfare programs...
           </>
         ) : (
           <>
-            <Check className="w-3.5 h-3.5" /> 提交
+            <Check className="w-3.5 h-3.5" /> Submit
           </>
         )}
       </Button>
@@ -161,12 +161,12 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'oala',
       name: '高額長者生活津貼 OALA',
-      description: '65岁或以上长者每月可获发津贴，需通过资产审查。',
+      description: '65歲或以上長者每月可獲發津貼，需通過資產審查。',
     });
     queries.push({
       id: 'health-voucher',
       name: '長者醫療券',
-      description: '65岁或以上长者每年$2,000医疗券，可累积至$8,000。',
+      description: '65歲或以上長者每年$2,000醫療券，可累積至$8,000。',
     });
   }
 
@@ -174,7 +174,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'cssa',
       name: '綜合社會保障援助 CSSA',
-      description: '为经济困难人士提供现金援助，包括生活费和租金津贴。',
+      description: '為經濟困難人士提供現金援助，包括生活費和租金津貼。',
     });
   }
 
@@ -182,7 +182,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'public-housing',
       name: '公共房屋申請',
-      description: '为符合资格的低收入家庭提供租住公屋。',
+      description: '為符合資格的低收入家庭提供租住公屋。',
     });
   }
 
@@ -190,7 +190,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'wfa',
       name: '在職家庭津貼',
-      description: '为低收入在职家庭提供津贴，需符合工时及入息要求。',
+      description: '為低收入在職家庭提供津貼，需符合工時及入息要求。',
     });
   }
 
@@ -199,7 +199,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'cssa',
       name: '綜合社會保障援助 CSSA',
-      description: '为经济困难人士提供现金援助。',
+      description: '為經濟困難人士提供現金援助。',
     });
   }
 

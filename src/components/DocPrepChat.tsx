@@ -178,7 +178,7 @@ const DocPrepChat = () => {
   const handleInfoSubmit = () => {
     if (!infoForm.name.trim()) return;
     setDocPrepUserInfo(infoForm);
-    addTerminalLog(`[DocPrep] 用户信息已提交: ${infoForm.name}`);
+    addTerminalLog(`[DocPrep] User info submitted: ${infoForm.name}`);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

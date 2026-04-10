@@ -88,7 +88,7 @@ const ChatInterface = () => {
       timestamp: new Date(),
     };
     addChatMessage(userMsg);
-    addTerminalLog(`[Chat] 用户: "${input.trim().slice(0, 60)}"`);
+    addTerminalLog(`[Chat] User: "${input.trim().slice(0, 60)}"`);
 
     const messageText = input.trim();
     setInput('');
@@ -97,7 +97,7 @@ const ChatInterface = () => {
 
   const handleNewInquiry = () => {
     setInput('');
-    addTerminalLog('[System] 新查询已开始。');
+    addTerminalLog('[System] New inquiry started.');
   };
 
   return (
@@ -116,7 +116,7 @@ const ChatInterface = () => {
               {msg.type === 'form_request' && msg.fields && !msg.formSubmitted ? (
                 <DynamicForm messageId={msg.id} title={msg.formTitle} fields={msg.fields} />
               ) : msg.type === 'form_request' && msg.formSubmitted ? (
-                <p className="text-sm text-muted-foreground italic">✓ 表单已提交</p>
+                <p className="text-sm text-muted-foreground italic">✓ Form submitted</p>
               ) : msg.type === 'welfare_cards' && msg.welfareCards ? (
                 <WelfareCardList cards={msg.welfareCards} />
               ) : (
@@ -134,7 +134,7 @@ const ChatInterface = () => {
               <Bot className="w-3.5 h-3.5 text-primary" />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
-                <span>思考中...</span>
+                <span>Thinking...</span>
               </div>
             </div>
           </div>
@@ -149,7 +149,7 @@ const ChatInterface = () => {
           <button
             onClick={handleNewInquiry}
             className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center hover:bg-accent transition-colors text-muted-foreground"
-            title="新查询"
+            title="New inquiry"
           >
             <Plus className="w-4.5 h-4.5" />
           </button>

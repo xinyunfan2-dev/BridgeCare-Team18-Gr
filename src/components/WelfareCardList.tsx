@@ -8,30 +8,30 @@ import { Button } from '@/components/ui/button';
 // Per-program required docs and timeline steps
 const PROGRAM_INFO: Record<string, { docs: string[]; timeline: string[] }> = {
   cssa: {
-    docs: ['香港身份证', '住址证明（如租约、水电费单）', '银行存折/月结单', '收入证明（如有）', '资产证明（如物业、股票）', '医疗报告（如适用）'],
-    timeline: ['前往社会保障办事处提交申请', '社工进行家访及审核', '等待审批结果（约4-6周）', '获批后每月领取援助金'],
+    docs: ['香港身份證', '住址證明（如租約、水電費單）', '銀行存摺/月結單', '收入證明（如有）', '資產證明（如物業、股票）', '醫療報告（如適用）'],
+    timeline: ['前往社會保障辦事處提交申請', '社工進行家訪及審核', '等待審批結果（約4-6週）', '獲批後每月領取援助金'],
   },
   oala: {
-    docs: ['香港身份证', '银行存折/月结单', '资产证明文件', '住址证明'],
-    timeline: ['前往社会保障办事处或邮寄申请', '提交资产申报表', '等待审批（约2-4周）', '获批后每月自动发放津贴'],
+    docs: ['香港身份證', '銀行存摺/月結單', '資產證明文件', '住址證明'],
+    timeline: ['前往社會保障辦事處或郵寄申請', '提交資產申報表', '等待審批（約2-4週）', '獲批後每月自動發放津貼'],
   },
   'health-voucher': {
-    docs: ['香港身份证'],
-    timeline: ['年满65岁自动符合资格', '到已登记的医疗服务提供者使用', '每年$2,000自动充值，可累积至$8,000'],
+    docs: ['香港身份證'],
+    timeline: ['年滿65歲自動符合資格', '到已登記的醫療服務提供者使用', '每年$2,000自動充值，可累積至$8,000'],
   },
   'public-housing': {
-    docs: ['香港身份证', '住址证明', '收入及资产证明', '家庭成员关系证明', '申请表格HD274'],
-    timeline: ['填写公屋申请表（网上或亲自）', '提交申请至房屋署', '等待配额及审查（轮候约3-5年，长者优先）', '获编配单位后进行家访', '签署租约及入伙'],
+    docs: ['香港身份證', '住址證明', '收入及資產證明', '家庭成員關係證明', '申請表格HD274'],
+    timeline: ['填寫公屋申請表（網上或親自）', '提交申請至房屋署', '等待配額及審查（輪候約3-5年，長者優先）', '獲編配單位後進行家訪', '簽署租約及入伙'],
   },
   wfa: {
-    docs: ['香港身份证', '雇主证明/工作证明', '收入证明（粮单）', '银行存折', '住址证明'],
-    timeline: ['网上或邮寄提交申请', '在职家庭津贴办事处审核', '等待审批结果（约6-8周）', '获批后发放津贴'],
+    docs: ['香港身份證', '僱主證明/工作證明', '收入證明（糧單）', '銀行存摺', '住址證明'],
+    timeline: ['網上或郵寄提交申請', '在職家庭津貼辦事處審核', '等待審批結果（約6-8週）', '獲批後發放津貼'],
   },
 };
 
 const DEFAULT_INFO = {
-  docs: ['香港身份证', '住址证明', '收入/资产证明'],
-  timeline: ['准备所需文件', '前往相关部门提交申请', '等待审批', '获批后领取福利'],
+  docs: ['香港身份證', '住址證明', '收入/資產證明'],
+  timeline: ['準備所需文件', '前往相關部門提交申請', '等待審批', '獲批後領取福利'],
 };
 
 interface WelfareCardListProps {
@@ -51,7 +51,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
     const info = PROGRAM_INFO[card.id] || DEFAULT_INFO;
     const docItems = info.docs.map((doc, i) => ({
       id: `doc-${i}`,
-      label: `准备: ${doc}`,
+      label: `Prepare: ${doc}`,
       completed: false,
       category: 'doc' as const,
     }));
@@ -68,7 +68,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
       progress: 0,
       checklist: [...docItems, ...stepItems],
     });
-    addTerminalLog(`[Journey] 用户确认申请 "${card.name}"，已添加到 Journey。`);
+    addTerminalLog(`[Journey] User confirmed "${card.name}", added to Journey.`);
     setActiveStep(3);
     setConfirmed(prev => ({ ...prev, [card.id]: false }));
     setExpandedId(null);
@@ -110,7 +110,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
                 <div>
                   <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
                     <CheckSquare className="w-3.5 h-3.5 text-primary" />
-                    所需个人信息及证明文件
+                    所需個人資料及證明文件
                   </p>
                   <ul className="space-y-1.5 pl-1">
                     {info.docs.map((doc, i) => (
@@ -126,7 +126,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
                 <div>
                   <p className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
                     <ArrowRight className="w-3.5 h-3.5 text-primary" />
-                    申请步骤
+                    申請步驟
                   </p>
                   <ol className="space-y-2 pl-1">
                     {info.timeline.map((step, i) => (
@@ -143,7 +143,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
                 {/* Resources / Links */}
                 {card.resources.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-foreground mb-2">参考链接</p>
+                    <p className="text-xs font-semibold text-foreground mb-2">參考連結</p>
                     <div className="space-y-1">
                       {card.resources.map((res, i) => (
                         <a
@@ -172,7 +172,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
                       className="mt-0.5"
                     />
                     <span className="text-xs text-foreground leading-relaxed">
-                      我已了解该福利项目的申请要求，确认添加到我的申请旅程
+                      我已了解該福利項目的申請要求，確認添加到我的申請旅程
                     </span>
                   </label>
                   <Button
@@ -181,7 +181,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
                     disabled={!confirmed[card.id]}
                     onClick={() => handleConfirmAdd(card)}
                   >
-                    添加到 My Journey
+                    添加到My Journey
                   </Button>
                 </div>
               </div>
