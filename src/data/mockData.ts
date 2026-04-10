@@ -10,32 +10,9 @@ export const initialMessages: ChatMessage[] = [
   },
 ];
 
-export const samplePrograms: WelfareProgram[] = [
-  {
-    id: 'oala',
-    name: 'Old Age Living Allowance (OALA)',
-    status: 'not_started',
-    progress: 0,
-    checklist: [
-      { id: '1', label: 'Age verification (65+)', completed: false },
-      { id: '2', label: 'Asset declaration', completed: false },
-      { id: '3', label: 'Application submitted', completed: false },
-    ],
-  },
-  {
-    id: 'cssa',
-    name: 'CSSA',
-    status: 'not_started',
-    progress: 0,
-    checklist: [
-      { id: '1', label: 'Income assessment', completed: false },
-      { id: '2', label: 'Residency verification', completed: false },
-      { id: '3', label: 'Application submitted', completed: false },
-    ],
-  },
-];
+export const samplePrograms: WelfareProgram[] = [];
 
 export const initialTerminalLogs: string[] = [
-  `[${new Date().toLocaleTimeString()}] [System] HK Welfare AI Agent initialized.`,
-  `[${new Date().toLocaleTimeString()}] [System] DeepSeek integration ready.`,
+  `[${new Date().toLocaleTimeString()}] [System] HK Welfare AI Agent 已启动。`,
+  `[${new Date().toLocaleTimeString()}] [System] DeepSeek + Exa 集成就绪。`,
 ];

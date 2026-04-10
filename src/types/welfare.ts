@@ -7,15 +7,23 @@ export interface FormField {
   placeholder?: string;
 }
 
+export interface WelfareCard {
+  id: string;
+  name: string;
+  description: string;
+  resources: { title: string; url: string; snippet: string }[];
+}
+
 export interface ChatMessage {
   id: string;
   role: 'user' | 'agent';
-  type: 'text' | 'form_request';
+  type: 'text' | 'form_request' | 'welfare_cards';
   content?: string;
   fields?: FormField[];
   formTitle?: string;
   timestamp: Date;
   formSubmitted?: boolean;
+  welfareCards?: WelfareCard[];
 }
 
 export interface ChecklistItem {
