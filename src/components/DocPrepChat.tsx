@@ -126,7 +126,7 @@ interface RankedOffice {
 const DocPrepChat = () => {
   const {
     docPrepSession, setDocPrepUserInfo, addPreparedDoc, advanceDocPrep,
-    addTerminalLog, addChatMessage, clearDocPrep,
+    addTerminalLog, addChatMessage, clearDocPrep, updateProgramProgress,
   } = useWelfare();
 
   const [infoForm, setInfoForm] = useState<UserInfo>({ name: '', hkid: '', phone: '', address: '', email: '' });
