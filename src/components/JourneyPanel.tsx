@@ -30,7 +30,7 @@ const JourneyPanel = () => {
   const { journeyApplications, updateProgramProgress, userProfile, startDocPrep, docPrepSession, addChatMessage, addTerminalLog } = useWelfare();
 
   const handleStartDocPrep = (programId: string, programName: string) => {
-    const docs = PROGRAM_DOCS[programId] || ['香港身份证', '住址证明', '收入/资产证明'];
+    const docs = PROGRAM_DOCS[programId] || ['HK ID Card', 'Proof of Address', 'Income / Asset Proof'];
     startDocPrep(programId, programName, docs);
     addChatMessage({
       id: Date.now().toString(),
