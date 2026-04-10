@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
-import { FormField, ChatMessage } from '@/types/welfare';
+import { FormField, ChatMessage, WelfareCard } from '@/types/welfare';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Check, Loader2 } from 'lucide-react';
-import { callDeepSeek, buildFieldsFromMissing } from '@/services/deepseek';
+import { searchWelfareResources } from '@/services/exa';
 
 interface DynamicFormProps {
   messageId: string;
@@ -13,7 +13,7 @@ interface DynamicFormProps {
 }
 
 const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
-  const { updateProfile, markFormSubmitted, completeStep, activeStep, addTerminalLog, addChatMessage, userProfile, chatMessages, setActiveStep } = useWelfare();
+  const { updateProfile, markFormSubmitted, completeStep, activeStep, addTerminalLog, addChatMessage, userProfile, chatMessages } = useWelfare();
   const [values, setValues] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,72 +43,70 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
     updateProfile(parsed);
     markFormSubmitted(messageId);
     completeStep(activeStep);
-    addTerminalLog('[Data] User profile updated. Recalculating eligibility...');
+    addTerminalLog('[Data] 用户资料已更新。正在搜索适用的福利项目...');
 
-    // Build updated profile for follow-up call
-    const updatedProfile = { ...userProfile, ...parsed };
-    const profileSummary = Object.entries(updatedProfile)
-      .filter(([, v]) => v !== undefined && v !== '')
-      .map(([k, v]) => `${k}: ${v}`)
-      .join(', ');
-
+    // Now search for welfare programs using Exa
     try {
-      addTerminalLog('[Agent] Re-analyzing with updated profile...');
+      addTerminalLog('[Exa] 正在搜索香港福利资源...');
 
-      const conversationHistory = chatMessages
-        .filter(m => m.type === 'text' && m.content)
-        .map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content! }));
+      // Determine search queries based on user profile
+      const updatedProfile = { ...userProfile, ...parsed };
+      const searchQueries = buildSearchQueries(updatedProfile);
 
-      const result = await callDeepSeek(
-        `User has provided additional information: ${profileSummary}. Please re-evaluate eligibility.`,
-        updatedProfile,
-        conversationHistory
-      );
+      const allCards: WelfareCard[] = [];
 
-      addTerminalLog(`[Agent] Follow-up category: ${result.category}`);
-      addTerminalLog(`[Agent] Thought: ${result.thought_process.slice(0, 120)}...`);
+      for (const query of searchQueries) {
+        addTerminalLog(`[Exa] 搜索: "${query.name}"...`);
+        const resources = await searchWelfareResources(query.name);
+        allCards.push({
+          id: query.id,
+          name: query.name,
+          description: query.description,
+          resources: resources.map(r => ({
+            title: r.title,
+            url: r.url,
+            snippet: r.snippet,
+          })),
+        });
+      }
 
-      if (result.missing_fields && result.missing_fields.length > 0) {
-        const replyMsg: ChatMessage = {
+      if (allCards.length > 0) {
+        const introMsg: ChatMessage = {
           id: Date.now().toString(),
           role: 'agent',
           type: 'text',
-          content: result.reply_text,
+          content: '根据您提供的信息，以下是您可能符合资格的福利项目。点击卡片即可开始申请流程：',
           timestamp: new Date(),
         };
-        addChatMessage(replyMsg);
+        addChatMessage(introMsg);
 
-        const formFields = buildFieldsFromMissing(result.missing_fields);
-        const formMsg: ChatMessage = {
+        const cardsMsg: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: 'agent',
-          type: 'form_request',
-          formTitle: `Additional info needed (${result.category})`,
-          fields: formFields,
+          type: 'welfare_cards',
+          welfareCards: allCards,
           timestamp: new Date(),
         };
-        addChatMessage(formMsg);
-        addTerminalLog(`[Agent] Still missing: ${result.missing_fields.join(', ')}`);
+        addChatMessage(cardsMsg);
+        addTerminalLog(`[Exa] 找到 ${allCards.length} 个适用福利项目。`);
       } else {
-        const replyMsg: ChatMessage = {
+        const fallbackMsg: ChatMessage = {
           id: Date.now().toString(),
           role: 'agent',
           type: 'text',
-          content: result.reply_text,
+          content: '感谢您的信息。我正在为您匹配适合的福利项目，请稍后再试。',
           timestamp: new Date(),
         };
-        addChatMessage(replyMsg);
-        addTerminalLog('[Agent] Eligibility assessment complete.');
-        setActiveStep(2);
+        addChatMessage(fallbackMsg);
       }
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      addTerminalLog(`[Error] Follow-up call failed: ${errMsg}`);
+      addTerminalLog(`[Error] Exa 搜索失败: ${errMsg}`);
       const fallback: ChatMessage = {
         id: Date.now().toString(),
         role: 'agent',
         type: 'text',
-        content: 'Thank you for providing this information. I\'ll process it and get back to you shortly.',
+        content: '感谢您提供的信息。搜索暂时出现问题，请稍后再试。',
         timestamp: new Date(),
       };
       addChatMessage(fallback);
@@ -141,16 +139,71 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Processing...
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> 搜索福利项目中...
           </>
         ) : (
           <>
-            <Check className="w-3.5 h-3.5" /> Submit
+            <Check className="w-3.5 h-3.5" /> 提交
           </>
         )}
       </Button>
     </div>
   );
 };
+
+// Determine which welfare programs to search based on user profile
+function buildSearchQueries(profile: Record<string, unknown>) {
+  const queries: { id: string; name: string; description: string }[] = [];
+  const age = Number(profile.age) || 0;
+  const income = Number(profile.income) || 0;
+
+  if (age >= 65) {
+    queries.push({
+      id: 'oala',
+      name: '高額長者生活津貼 OALA',
+      description: '65岁或以上长者每月可获发津贴，需通过资产审查。',
+    });
+    queries.push({
+      id: 'health-voucher',
+      name: '長者醫療券',
+      description: '65岁或以上长者每年$2,000医疗券，可累积至$8,000。',
+    });
+  }
+
+  if (income === 0 || income < 5000) {
+    queries.push({
+      id: 'cssa',
+      name: '綜合社會保障援助 CSSA',
+      description: '为经济困难人士提供现金援助，包括生活费和租金津贴。',
+    });
+  }
+
+  if (profile.rent || profile.housing === 'renting' || !profile.housing) {
+    queries.push({
+      id: 'public-housing',
+      name: '公共房屋申請',
+      description: '为符合资格的低收入家庭提供租住公屋。',
+    });
+  }
+
+  if (income > 0 && income < 20000) {
+    queries.push({
+      id: 'wfa',
+      name: '在職家庭津貼',
+      description: '为低收入在职家庭提供津贴，需符合工时及入息要求。',
+    });
+  }
+
+  // Fallback: always include at least CSSA
+  if (queries.length === 0) {
+    queries.push({
+      id: 'cssa',
+      name: '綜合社會保障援助 CSSA',
+      description: '为经济困难人士提供现金援助。',
+    });
+  }
+
+  return queries;
+}
 
 export default DynamicForm;

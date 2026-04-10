@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import DynamicForm from './DynamicForm';
+import WelfareCardList from './WelfareCardList';
 import { ChatMessage } from '@/types/welfare';
 import { Plus, ArrowUp, Bot, Loader2 } from 'lucide-react';
 import { callDeepSeek, buildFieldsFromMissing } from '@/services/deepseek';
@@ -23,58 +24,51 @@ const ChatInterface = () => {
 
   const processWithAI = async (messageText: string) => {
     setIsThinking(true);
-    addTerminalLog('[Agent] Analyzing intent...');
+    addTerminalLog('[Agent] 正在分析用户意图...');
 
     try {
       const result = await callDeepSeek(messageText, userProfile, conversationHistory);
 
-      addTerminalLog(`[Agent] Category: ${result.category}`);
-      addTerminalLog(`[Agent] Thought: ${result.thought_process.slice(0, 120)}...`);
+      addTerminalLog(`[Agent] 分类: ${result.category}`);
+      addTerminalLog(`[Agent] 思考: ${result.thought_process.slice(0, 120)}...`);
+
+      // Always show a brief reply text first
+      const replyMsg: ChatMessage = {
+        id: Date.now().toString(),
+        role: 'agent',
+        type: 'text',
+        content: result.reply_text,
+        timestamp: new Date(),
+      };
+      addChatMessage(replyMsg);
 
       if (result.missing_fields && result.missing_fields.length > 0) {
-        // Need more info → show reply text + form
-        const replyMsg: ChatMessage = {
-          id: Date.now().toString(),
-          role: 'agent',
-          type: 'text',
-          content: result.reply_text,
-          timestamp: new Date(),
-        };
-        addChatMessage(replyMsg);
-
+        // Show form to collect missing info
         const formFields = buildFieldsFromMissing(result.missing_fields);
         const formMsg: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: 'agent',
           type: 'form_request',
-          formTitle: `Please provide the following (${result.category})`,
+          formTitle: `请填写以下信息`,
           fields: formFields,
           timestamp: new Date(),
         };
         addChatMessage(formMsg);
-        addTerminalLog(`[Agent] Missing fields: ${result.missing_fields.join(', ')}. Form dispatched.`);
+        addTerminalLog(`[Agent] 需要补充: ${result.missing_fields.join(', ')}。表单已生成。`);
+        setActiveStep(1); // Profile step
       } else {
-        // All info collected → show recommendation
-        const replyMsg: ChatMessage = {
-          id: Date.now().toString(),
-          role: 'agent',
-          type: 'text',
-          content: result.reply_text,
-          timestamp: new Date(),
-        };
-        addChatMessage(replyMsg);
-        addTerminalLog('[Agent] All info sufficient. Recommendation provided.');
-        setActiveStep(2); // Move to Selection step
+        addTerminalLog('[Agent] 信息充足，可直接推荐。');
+        setActiveStep(2);
       }
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      addTerminalLog(`[Error] DeepSeek call failed: ${errMsg}`);
+      addTerminalLog(`[Error] DeepSeek 调用失败: ${errMsg}`);
 
       const fallback: ChatMessage = {
         id: Date.now().toString(),
         role: 'agent',
         type: 'text',
-        content: `I'm sorry, I encountered an issue processing your request. Please try again. (${errMsg})`,
+        content: `抱歉，处理您的请求时出现问题，请重试。(${errMsg})`,
         timestamp: new Date(),
       };
       addChatMessage(fallback);
@@ -93,7 +87,7 @@ const ChatInterface = () => {
       timestamp: new Date(),
     };
     addChatMessage(userMsg);
-    addTerminalLog(`[Chat] User: "${input.trim().slice(0, 60)}"`);
+    addTerminalLog(`[Chat] 用户: "${input.trim().slice(0, 60)}"`);
 
     const messageText = input.trim();
     setInput('');
@@ -102,7 +96,7 @@ const ChatInterface = () => {
 
   const handleNewInquiry = () => {
     setInput('');
-    addTerminalLog('[System] New inquiry started.');
+    addTerminalLog('[System] 新查询已开始。');
   };
 
   return (
@@ -121,7 +115,9 @@ const ChatInterface = () => {
               {msg.type === 'form_request' && msg.fields && !msg.formSubmitted ? (
                 <DynamicForm messageId={msg.id} title={msg.formTitle} fields={msg.fields} />
               ) : msg.type === 'form_request' && msg.formSubmitted ? (
-                <p className="text-sm text-muted-foreground italic">✓ Form submitted successfully</p>
+                <p className="text-sm text-muted-foreground italic">✓ 表单已提交</p>
+              ) : msg.type === 'welfare_cards' && msg.welfareCards ? (
+                <WelfareCardList cards={msg.welfareCards} />
               ) : (
                 <p className={`text-sm leading-[1.8] text-left font-thin font-serif ${msg.role === 'user' ? 'text-foreground' : 'text-foreground/90'}`}>
                   {msg.content}
@@ -137,20 +133,20 @@ const ChatInterface = () => {
               <Bot className="w-3.5 h-3.5 text-primary" />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
-                <span>Thinking...</span>
+                <span>思考中...</span>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Perplexity-style input */}
+      {/* Input */}
       <div className="px-6 pb-5 pt-2">
         <div className="flex items-center gap-2 rounded-full border bg-muted/20 px-3 py-2 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/40 transition-all shadow-sm">
           <button
             onClick={handleNewInquiry}
             className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center hover:bg-accent transition-colors text-muted-foreground"
-            title="New Inquiry"
+            title="新查询"
           >
             <Plus className="w-4.5 h-4.5" />
           </button>
@@ -158,7 +154,7 @@ const ChatInterface = () => {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
-            placeholder="Ask anything about HK welfare benefits..."
+            placeholder="描述您的情况，例如：我是65岁退休老人..."
             disabled={isThinking}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
