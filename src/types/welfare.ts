@@ -51,6 +51,23 @@ export interface UserProfile {
   [key: string]: unknown;
 }
 
+export interface PreparedDocument {
+  docLabel: string;
+  fileName: string;
+  pdfBlob: Blob;
+  imageDataUrl: string;
+}
+
+export interface DocPrepSession {
+  programId: string;
+  programName: string;
+  userName: string;
+  docs: string[];
+  currentDocIndex: number;
+  preparedDocs: PreparedDocument[];
+  status: 'asking_name' | 'collecting_docs' | 'completed';
+}
+
 export type StepName = 'Discovery' | 'Profile' | 'Selection' | 'Action' | 'Journey';
 
 export const STEPS: StepName[] = ['Discovery', 'Profile', 'Selection', 'Action', 'Journey'];
