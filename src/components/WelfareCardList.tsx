@@ -51,7 +51,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
     const info = PROGRAM_INFO[card.id] || DEFAULT_INFO;
     const docItems = info.docs.map((doc, i) => ({
       id: `doc-${i}`,
-      label: `准备: ${doc}`,
+      label: `Prepare: ${doc}`,
       completed: false,
       category: 'doc' as const,
     }));
@@ -68,7 +68,7 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
       progress: 0,
       checklist: [...docItems, ...stepItems],
     });
-    addTerminalLog(`[Journey] 用户确认申请 "${card.name}"，已添加到 Journey。`);
+    addTerminalLog(`[Journey] User confirmed "${card.name}", added to Journey.`);
     setActiveStep(3);
     setConfirmed(prev => ({ ...prev, [card.id]: false }));
     setExpandedId(null);

@@ -87,13 +87,13 @@ const JourneyPanel = () => {
                   onClick={() => handleStartDocPrep(program.id, program.name)}
                 >
                   <Play className="w-3 h-3" />
-                  开始准备申请文件
+                  Start Document Preparation
                 </Button>
               )}
 
               {isPrepping && (
                 <div className="rounded-xl bg-primary/5 px-3 py-2 text-xs text-primary font-medium text-center">
-                  📝 文件准备中...请在聊天区域操作
+                  📝 Preparing documents... Please operate in the chat area
                 </div>
               )}
 
@@ -101,7 +101,7 @@ const JourneyPanel = () => {
               <div className="space-y-1">
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 px-2 pt-1">
                   <FolderOpen className="w-3 h-3" />
-                  准备文件
+                  Documents
                 </p>
                 {docItems.map(item => (
                   <button
@@ -131,7 +131,7 @@ const JourneyPanel = () => {
                 <div className="space-y-1 border-t pt-2">
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 px-2 pt-1">
                     <ListChecks className="w-3 h-3" />
-                    申请步骤
+                    Application Steps
                   </p>
                   {stepItems.map(item => (
                     <button

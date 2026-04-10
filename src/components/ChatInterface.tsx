@@ -88,7 +88,7 @@ const ChatInterface = () => {
       timestamp: new Date(),
     };
     addChatMessage(userMsg);
-    addTerminalLog(`[Chat] 用户: "${input.trim().slice(0, 60)}"`);
+    addTerminalLog(`[Chat] User: "${input.trim().slice(0, 60)}"`);
 
     const messageText = input.trim();
     setInput('');
@@ -97,7 +97,7 @@ const ChatInterface = () => {
 
   const handleNewInquiry = () => {
     setInput('');
-    addTerminalLog('[System] 新查询已开始。');
+    addTerminalLog('[System] New inquiry started.');
   };
 
   return (
@@ -149,7 +149,7 @@ const ChatInterface = () => {
           <button
             onClick={handleNewInquiry}
             className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center hover:bg-accent transition-colors text-muted-foreground"
-            title="新查询"
+            title="New inquiry"
           >
             <Plus className="w-4.5 h-4.5" />
           </button>
