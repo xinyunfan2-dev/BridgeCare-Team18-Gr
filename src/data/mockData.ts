@@ -5,7 +5,7 @@ export const initialMessages: ChatMessage[] = [
     id: '1',
     role: 'agent',
     type: 'text',
-    content: "Welcome! I'm your AI Welfare Agent for Hong Kong. I can help you discover benefits you may qualify for — such as OALA, CSSA, public housing, and more. Simply describe your situation, and I'll analyze what you may be eligible for.",
+    content: "Hi! I'm your AI Welfare Agent. Tell me a bit about your situation (age, income, or housing), and I'll find the best HK benefits for you.",
     timestamp: new Date(),
   },
 ];

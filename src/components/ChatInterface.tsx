@@ -123,7 +123,7 @@ const ChatInterface = () => {
               ) : msg.type === 'form_request' && msg.formSubmitted ? (
                 <p className="text-sm text-muted-foreground italic">✓ Form submitted successfully</p>
               ) : (
-                <p className={`text-sm leading-[1.8] ${msg.role === 'user' ? 'text-foreground' : 'text-foreground/90'}`}>
+                <p className={`text-sm leading-[1.8] text-left font-thin font-serif ${msg.role === 'user' ? 'text-foreground' : 'text-foreground/90'}`}>
                   {msg.content}
                 </p>
               )}
