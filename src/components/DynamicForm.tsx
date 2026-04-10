@@ -161,12 +161,12 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'oala',
       name: '高額長者生活津貼 OALA',
-      description: '65岁或以上长者每月可获发津贴，需通过资产审查。',
+      description: '65歲或以上長者每月可獲發津貼，需通過資產審查。',
     });
     queries.push({
       id: 'health-voucher',
       name: '長者醫療券',
-      description: '65岁或以上长者每年$2,000医疗券，可累积至$8,000。',
+      description: '65歲或以上長者每年$2,000醫療券，可累積至$8,000。',
     });
   }
 
@@ -174,7 +174,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'cssa',
       name: '綜合社會保障援助 CSSA',
-      description: '为经济困难人士提供现金援助，包括生活费和租金津贴。',
+      description: '為經濟困難人士提供現金援助，包括生活費和租金津貼。',
     });
   }
 
@@ -182,7 +182,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'public-housing',
       name: '公共房屋申請',
-      description: '为符合资格的低收入家庭提供租住公屋。',
+      description: '為符合資格的低收入家庭提供租住公屋。',
     });
   }
 
@@ -190,7 +190,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'wfa',
       name: '在職家庭津貼',
-      description: '为低收入在职家庭提供津贴，需符合工时及入息要求。',
+      description: '為低收入在職家庭提供津貼，需符合工時及入息要求。',
     });
   }
 
@@ -199,7 +199,7 @@ function buildSearchQueries(profile: Record<string, unknown>) {
     queries.push({
       id: 'cssa',
       name: '綜合社會保障援助 CSSA',
-      description: '为经济困难人士提供现金援助。',
+      description: '為經濟困難人士提供現金援助。',
     });
   }
 
