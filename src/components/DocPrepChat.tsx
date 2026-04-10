@@ -420,54 +420,84 @@ const DocPrepChat = () => {
                   </p>
                 </div>
 
-                {/* Offices list */}
-                {officeData.offices.map((office, i) => (
-                  <div key={i} className="rounded-xl border bg-accent/5 p-3 space-y-2">
-                    <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                      {office.name}
-                    </p>
-                    <div className="ml-5 space-y-1 text-xs text-foreground/80">
-                      <p className="flex items-start gap-1.5">
-                        <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
-                        {office.address}
-                      </p>
-                      <p className="flex items-start gap-1.5">
-                        <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
-                        {office.officeHours}
-                      </p>
-                      <p>📞 Tel: {office.phone}</p>
-                      {office.walkInNote && (
-                        <p className="text-muted-foreground italic">ℹ️ {office.walkInNote}</p>
-                      )}
-                    </div>
+                {/* Loading ranking */}
+                {isRanking && (
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 flex items-center gap-2 animate-pulse">
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    <p className="text-xs text-foreground/80">正在根据您的地址「{docPrepSession.userInfo.address}」查找最近的办事处...</p>
+                  </div>
+                )}
 
-                    {/* Online booking URL + fake booking button */}
-                    {office.onlineBookingUrl && (
-                      <div className="ml-5 flex flex-col gap-1.5 mt-1">
-                        <a
-                          href={office.onlineBookingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          Online Portal: {office.onlineBookingUrl}
-                        </a>
-                        {bookingState === 'idle' && (
-                          <Button
-                            variant="outline" size="sm"
-                            className="rounded-full gap-1.5 text-xs w-fit"
-                            onClick={() => handleFakeBooking(office.name)}
-                          >
-                            <CalendarCheck className="w-3 h-3" />
-                            Book Appointment Online
-                          </Button>
+                {/* Offices list — sorted by distance if available */}
+                {(() => {
+                  const sortedOffices = rankedOffices.length > 0
+                    ? rankedOffices.map(r => ({ ...officeData.offices[r.index], _ranked: r }))
+                    : officeData.offices.map(o => ({ ...o, _ranked: null as RankedOffice | null }));
+
+                  return sortedOffices.map((office, i) => (
+                    <div key={i} className="rounded-xl border bg-accent/5 p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                          {office.name}
+                        </p>
+                        {office._ranked && (
+                          <span className="flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+                            <Navigation className="w-3 h-3" />
+                            {office._ranked.distance_label}
+                          </span>
                         )}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      {i === 0 && office._ranked && (
+                        <p className="text-xs font-medium text-primary ml-5">⭐ 距离您最近的办事处</p>
+                      )}
+                      <div className="ml-5 space-y-1 text-xs text-foreground/80">
+                        <p className="flex items-start gap-1.5">
+                          <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
+                          {office.address}
+                        </p>
+                        <p className="flex items-start gap-1.5">
+                          <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
+                          {office.officeHours}
+                        </p>
+                        <p>📞 Tel: {office.phone}</p>
+                        {office._ranked?.transport_suggestion && (
+                          <p className="flex items-start gap-1.5 text-primary/80">
+                            🚇 {office._ranked.transport_suggestion}
+                          </p>
+                        )}
+                        {office.walkInNote && (
+                          <p className="text-muted-foreground italic">ℹ️ {office.walkInNote}</p>
+                        )}
+                      </div>
+
+                      {/* Online booking URL + fake booking button */}
+                      {office.onlineBookingUrl && (
+                        <div className="ml-5 flex flex-col gap-1.5 mt-1">
+                          <a
+                            href={office.onlineBookingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline flex items-center gap-1"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            Online Portal: {office.onlineBookingUrl}
+                          </a>
+                          {bookingState === 'idle' && (
+                            <Button
+                              variant="outline" size="sm"
+                              className="rounded-full gap-1.5 text-xs w-fit"
+                              onClick={() => handleFakeBooking(office.name)}
+                            >
+                              <CalendarCheck className="w-3 h-3" />
+                              Book Appointment Online
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ));
+                })()}
 
                 {/* Booking animation */}
                 {bookingState === 'booking' && (
