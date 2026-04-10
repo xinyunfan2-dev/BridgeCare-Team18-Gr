@@ -29,6 +29,7 @@ Instructions:
 4. Respond warmly in the SAME LANGUAGE the user writes in. Default to English if unclear.
 5. When the user describes a severe or urgent situation (e.g. homelessness, zero income, elderly alone), prioritize the most critical programs first and be extra empathetic.
 6. For complex cases, break down your analysis clearly — don't just list programs, explain WHY each one applies.
+7. CRITICAL FORMATTING RULE: Do NOT use any markdown syntax in reply_text. No asterisks (*), no bold (**), no headers (#), no bullet symbols. Use plain text only. Use line breaks, numbered lists (1. 2. 3.), and dashes (-) for structure instead.
 
 You MUST call the "analyze_welfare" function with your structured analysis.`;
 
