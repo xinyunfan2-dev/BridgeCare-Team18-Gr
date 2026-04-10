@@ -128,8 +128,19 @@ const DocPrepChat = () => {
   };
 
   const handleDownloadSingle = (doc: PreparedDocument) => {
-    saveAs(doc.pdfBlob, doc.fileName);
+    downloadBlob(doc.pdfBlob, doc.fileName);
     addTerminalLog(`[DocPrep] 下载: ${doc.fileName}`);
+  };
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
