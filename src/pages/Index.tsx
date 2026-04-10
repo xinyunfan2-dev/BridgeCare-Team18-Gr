@@ -12,7 +12,7 @@ const Index = () => {
         <header className="flex items-center justify-between px-6 py-3 bg-background border-b">
           <div className="flex flex-col">
             <span className="text-lg font-bold text-primary tracking-tight leading-tight">BridgeCare</span>
-            <span className="text-[10px] text-muted-foreground tracking-widest uppercase leading-tight">Your Welfare AI</span>
+            <span className="text-muted-foreground tracking-widest uppercase leading-tight font-serif text-sm">{"\n"}</span>
           </div>
           <BreadcrumbStepper />
           <div className="w-20" />
