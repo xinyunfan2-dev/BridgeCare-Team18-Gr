@@ -132,6 +132,7 @@ const DocPrepChat = () => {
   const [infoForm, setInfoForm] = useState<UserInfo>({ name: '', hkid: '', phone: '', address: '', email: '' });
   const [isGenerating, setIsGenerating] = useState(false);
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked'>('idle');
+  const [zipDownloaded, setZipDownloaded] = useState(false);
   const [bookedOfficeName, setBookedOfficeName] = useState('');
   const [rankedOffices, setRankedOffices] = useState<RankedOffice[]>([]);
   const [isRanking, setIsRanking] = useState(false);
