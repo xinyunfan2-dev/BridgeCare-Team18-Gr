@@ -20,7 +20,7 @@ interface WelfareState {
   updateProgramProgress: (programId: string, checklistItemId: string) => void;
   addTerminalLog: (log: string) => void;
   startDocPrep: (programId: string, programName: string, docs: string[]) => void;
-  setDocPrepUserName: (name: string) => void;
+  setDocPrepUserInfo: (info: import('@/types/welfare').UserInfo) => void;
   addPreparedDoc: (doc: PreparedDocument) => void;
   advanceDocPrep: () => void;
   completeDocPrep: () => void;
@@ -120,16 +120,17 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
       programId,
       programName,
       userName: '',
+      userInfo: { name: '', hkid: '', phone: '', address: '', email: '' },
       docs,
       currentDocIndex: 0,
       preparedDocs: [],
-      status: 'asking_name',
+      status: 'asking_info',
     });
     addTerminalLog(`[DocPrep] 开始为 "${programName}" 准备申请文件。`);
   }, [addTerminalLog]);
 
-  const setDocPrepUserName = useCallback((name: string) => {
-    setDocPrepSession(prev => prev ? { ...prev, userName: name, status: 'collecting_docs' } : prev);
+  const setDocPrepUserInfo = useCallback((info: import('@/types/welfare').UserInfo) => {
+    setDocPrepSession(prev => prev ? { ...prev, userName: info.name, userInfo: info, status: 'collecting_docs' } : prev);
   }, []);
 
   const addPreparedDoc = useCallback((doc: PreparedDocument) => {
@@ -159,7 +160,7 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
     <WelfareContext.Provider value={{
       activeStep, stepCompleted, userProfile, chatMessages, journeyApplications, terminalLogs, docPrepSession,
       setActiveStep, completeStep, navigateBack, updateProfile, addChatMessage, markFormSubmitted,
-      addProgram, updateProgramProgress, addTerminalLog, startDocPrep, setDocPrepUserName,
+      addProgram, updateProgramProgress, addTerminalLog, startDocPrep, setDocPrepUserInfo,
       addPreparedDoc, advanceDocPrep, completeDocPrep, clearDocPrep,
     }}>
       {children}
