@@ -115,6 +115,14 @@ const PROGRAM_OFFICE_DATA: Record<string, ProgramOfficeData> = {
   },
 };
 
+interface RankedOffice {
+  index: number;
+  name: string;
+  distance_km: number;
+  distance_label: string;
+  transport_suggestion: string;
+}
+
 const DocPrepChat = () => {
   const {
     docPrepSession, setDocPrepUserInfo, addPreparedDoc, advanceDocPrep,
@@ -125,7 +133,42 @@ const DocPrepChat = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked'>('idle');
   const [bookedOfficeName, setBookedOfficeName] = useState('');
+  const [rankedOffices, setRankedOffices] = useState<RankedOffice[]>([]);
+  const [isRanking, setIsRanking] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const session = docPrepSession;
+
+  // Fetch ranked offices when completed
+  useEffect(() => {
+    if (!session || session.status !== 'completed') return;
+    const officeData = PROGRAM_OFFICE_DATA[session.programId];
+    if (!officeData || !session.userInfo.address || rankedOffices.length > 0 || isRanking) return;
+
+    const fetchRanking = async () => {
+      setIsRanking(true);
+      addTerminalLog('[Office] 正在通过 AI 分析最近的办事处...');
+      try {
+        const { data, error } = await supabase.functions.invoke('deepseek-proxy', {
+          body: {
+            action: 'rank_offices',
+            userAddress: session.userInfo.address,
+            offices: officeData.offices.map(o => ({ name: o.name, address: o.address })),
+          },
+        });
+        if (error) throw error;
+        if (data?.ranked_offices?.length) {
+          setRankedOffices(data.ranked_offices);
+          addTerminalLog(`[Office] ✓ 已按距离排序 ${data.ranked_offices.length} 个办事处。`);
+        }
+      } catch (err) {
+        addTerminalLog(`[Office] 排序失败: ${err}`);
+      } finally {
+        setIsRanking(false);
+      }
+    };
+    fetchRanking();
+  }, [session?.status, session?.programId, session?.userInfo.address]);
 
   if (!docPrepSession) return null;
 
