@@ -126,7 +126,7 @@ interface RankedOffice {
 const DocPrepChat = () => {
   const {
     docPrepSession, setDocPrepUserInfo, addPreparedDoc, advanceDocPrep,
-    addTerminalLog, addChatMessage, clearDocPrep,
+    addTerminalLog, addChatMessage, clearDocPrep, updateProgramProgress,
   } = useWelfare();
 
   const [infoForm, setInfoForm] = useState<UserInfo>({ name: '', hkid: '', phone: '', address: '', email: '' });
@@ -196,6 +196,8 @@ const DocPrepChat = () => {
 
       const prepDoc: PreparedDocument = { docLabel, fileName, pdfBlob, imageDataUrl };
       addPreparedDoc(prepDoc);
+      // Auto-check the corresponding doc item in Journey panel
+      updateProgramProgress(programId, `doc-${currentDocIndex}`);
       advanceDocPrep();
       addTerminalLog(`[DocPrep] ✓ "${fileName}" 已生成。`);
     } catch (err) {
@@ -299,6 +301,8 @@ const DocPrepChat = () => {
     setTimeout(() => {
       setBookingState('booked');
       addTerminalLog(`[Booking] ✓ Appointment confirmed at ${officeName}.`);
+      // Auto-check the first step item ("前往社会保障办事处提交申请") in Journey panel
+      updateProgramProgress(programId, 'step-0');
     }, 2500);
   };
 
