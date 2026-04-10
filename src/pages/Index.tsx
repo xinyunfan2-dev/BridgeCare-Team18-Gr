@@ -10,8 +10,9 @@ const Index = () => {
       <div className="flex flex-col h-screen bg-muted/30">
         {/* Top: Breadcrumb */}
         <header className="flex items-center justify-between px-6 py-3 bg-background border-b">
-          <div className="flex items-center gap-3">
-            <span className="text-base font-semibold text-primary tracking-tight">BridgeCare</span>
+          <div className="flex flex-col">
+            <span className="text-lg font-bold text-primary tracking-tight leading-tight">BridgeCare</span>
+            <span className="text-[10px] text-muted-foreground tracking-widest uppercase leading-tight">Your Welfare AI</span>
           </div>
           <BreadcrumbStepper />
           <div className="w-20" />
