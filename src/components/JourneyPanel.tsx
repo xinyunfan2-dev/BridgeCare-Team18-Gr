@@ -5,11 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 const PROGRAM_DOCS: Record<string, string[]> = {
-  cssa: ['香港身份证', '住址证明', '银行存折/月结单', '收入证明', '资产证明', '医疗报告'],
-  oala: ['香港身份证', '银行存折/月结单', '资产证明文件', '住址证明'],
-  'health-voucher': ['香港身份证'],
-  'public-housing': ['香港身份证', '住址证明', '收入及资产证明', '家庭成员关系证明', '申请表格HD274'],
-  wfa: ['香港身份证', '雇主证明/工作证明', '收入证明（粮单）', '银行存折', '住址证明'],
+  cssa: ['HK ID Card', 'Proof of Address', 'Bank Passbook / Statement', 'Income Proof', 'Asset Proof', 'Medical Report'],
+  oala: ['HK ID Card', 'Bank Passbook / Statement', 'Asset Proof', 'Proof of Address'],
+  'health-voucher': ['HK ID Card'],
+  'public-housing': ['HK ID Card', 'Proof of Address', 'Income & Asset Proof', 'Family Relationship Proof', 'Application Form HD274'],
+  wfa: ['HK ID Card', 'Employer Certificate', 'Income Proof (Payslip)', 'Bank Passbook', 'Proof of Address'],
 };
 
 const statusLabels: Record<string, string> = {
