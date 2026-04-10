@@ -20,7 +20,7 @@ interface WelfareState {
   updateProgramProgress: (programId: string, checklistItemId: string) => void;
   addTerminalLog: (log: string) => void;
   startDocPrep: (programId: string, programName: string, docs: string[]) => void;
-  setDocPrepUserName: (name: string) => void;
+  setDocPrepUserInfo: (info: import('@/types/welfare').UserInfo) => void;
   addPreparedDoc: (doc: PreparedDocument) => void;
   advanceDocPrep: () => void;
   completeDocPrep: () => void;

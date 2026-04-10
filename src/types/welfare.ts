@@ -58,14 +58,23 @@ export interface PreparedDocument {
   imageDataUrl: string;
 }
 
+export interface UserInfo {
+  name: string;
+  hkid: string;
+  phone: string;
+  address: string;
+  email: string;
+}
+
 export interface DocPrepSession {
   programId: string;
   programName: string;
   userName: string;
+  userInfo: UserInfo;
   docs: string[];
   currentDocIndex: number;
   preparedDocs: PreparedDocument[];
-  status: 'asking_name' | 'collecting_docs' | 'completed';
+  status: 'asking_info' | 'collecting_docs' | 'completed';
 }
 
 export type StepName = 'Discovery' | 'Profile' | 'Selection' | 'Action' | 'Journey';
