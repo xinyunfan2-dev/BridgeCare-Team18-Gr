@@ -5,20 +5,7 @@ export const initialMessages: ChatMessage[] = [
     id: '1',
     role: 'agent',
     type: 'text',
-    content: "Welcome! I'm your AI Welfare Agent for Hong Kong. I can help you discover benefits you may qualify for — such as OALA, CSSA, public housing, and more. Tell me about your situation, or fill in the form below to get started.",
-    timestamp: new Date(),
-  },
-  {
-    id: '2',
-    role: 'agent',
-    type: 'form_request',
-    formTitle: 'Tell us about yourself',
-    fields: [
-      { name: 'name', type: 'text', label: 'Full Name', required: true, placeholder: 'e.g. Chan Tai Man' },
-      { name: 'age', type: 'number', label: 'Age', required: true, placeholder: 'e.g. 68' },
-      { name: 'income', type: 'number', label: 'Monthly Income (HKD)', required: true, placeholder: '0' },
-      { name: 'household_size', type: 'number', label: 'Household Size', required: true, placeholder: '1' },
-    ],
+    content: "Welcome! I'm your AI Welfare Agent for Hong Kong. I can help you discover benefits you may qualify for — such as OALA, CSSA, public housing, and more. Simply describe your situation, and I'll analyze what you may be eligible for.",
     timestamp: new Date(),
   },
 ];
