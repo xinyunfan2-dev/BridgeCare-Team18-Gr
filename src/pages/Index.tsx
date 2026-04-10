@@ -1,4 +1,4 @@
-import { WelfareProvider } from '@/context/WelfareContext';
+
 import BreadcrumbStepper from '@/components/BreadcrumbStepper';
 import TerminalConsole from '@/components/TerminalConsole';
 import ChatInterface from '@/components/ChatInterface';
@@ -6,7 +6,7 @@ import JourneyPanel from '@/components/JourneyPanel';
 
 const Index = () => {
   return (
-    <WelfareProvider>
+    <>
       <div className="flex flex-col h-screen bg-muted/30">
         {/* Top: Breadcrumb */}
         <header className="flex items-center justify-between px-6 py-3 bg-background border-b">
@@ -35,7 +35,7 @@ const Index = () => {
           </aside>
         </div>
       </div>
-    </WelfareProvider>
+    </>
   );
 };
 
