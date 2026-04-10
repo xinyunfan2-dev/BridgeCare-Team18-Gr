@@ -36,10 +36,10 @@ const JourneyPanel = () => {
       id: Date.now().toString(),
       role: 'agent',
       type: 'text',
-      content: `📋 现在开始为您准备 "${programName}" 的申请文件。请在下方的文件准备助手中操作。`,
+      content: `📋 Let's start preparing the application documents for "${programName}". Please follow the document prep assistant below.`,
       timestamp: new Date(),
     });
-    addTerminalLog(`[DocPrep] 用户启动 "${programName}" 文件准备流程。`);
+    addTerminalLog(`[DocPrep] User started document preparation for "${programName}".`);
   };
 
   return (
