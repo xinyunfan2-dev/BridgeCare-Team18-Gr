@@ -13,6 +13,6 @@ export const initialMessages: ChatMessage[] = [
 export const samplePrograms: WelfareProgram[] = [];
 
 export const initialTerminalLogs: string[] = [
-  `[${new Date().toLocaleTimeString()}] [System] HK Welfare AI Agent 已启动。`,
-  `[${new Date().toLocaleTimeString()}] [System] DeepSeek + Exa 集成就绪。`,
+  `[${new Date().toLocaleTimeString()}] [System] BridgeCare Welfare AI Agent started.`,
+  `[${new Date().toLocaleTimeString()}] [System] DeepSeek + Exa integration ready.`,
 ];
