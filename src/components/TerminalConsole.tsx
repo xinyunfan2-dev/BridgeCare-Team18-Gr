@@ -20,7 +20,7 @@ const TerminalConsole = () => {
       </div>
       <div ref={scrollRef} className="h-28 overflow-y-auto px-4 py-2 space-y-0.5">
         {terminalLogs.map((log, i) => (
-          <p key={i} className="text-xs font-mono text-muted-foreground leading-relaxed">
+          <p key={i} className="text-xs font-mono leading-relaxed bg-primary text-primary-foreground">
             {log}
           </p>
         ))}
