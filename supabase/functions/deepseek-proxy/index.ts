@@ -8,32 +8,61 @@ const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 const HK_WELFARE_KNOWLEDGE = `
 Hong Kong Welfare Policy Reference:
 - OALA (Old Age Living Allowance): Age 65+, asset limits apply. Normal: $387,000 single / $587,000 couple. Higher: $163,000 single / $247,000 couple.
-- CSSA (Comprehensive Social Security Assistance): Means-tested. Single able-bodied: ~$2,765/month. Elderly single (60+): ~$4,060/month. Must be HK resident 1+ year.
-- Public Housing: Income limits vary by household size. 1-person: $12,940/month. 2-person: $19,550/month. Wait time ~5.5 years average.
+- CSSA (Comprehensive Social Security Assistance): Means-tested. Single able-bodied: ~$2,765/month. Elderly single (60+): ~$4,060/month. Must be HK resident 1+ year. Covers rent, food, utilities for those with no/very low income.
+- Public Housing: Income limits vary by household size. 1-person: $12,940/month. 2-person: $19,550/month. Wait time ~5.5 years average. Elderly priority schemes available.
 - Elderly Health Care Voucher: Age 65+, $2,000/year, accumulate up to $8,000.
 - Transport Subsidy (PTSS): Monthly transport >$400, subsidy = 1/3 of excess, max $400/month.
 - Disability Allowance: Normal $1,935/month, Higher $3,870/month. Requires medical certification.
 - Working Family Allowance: Household income limits, working hours requirements (144+ hours/month for full rate).
+- Emergency Relief: Short-term food assistance, temporary shelter for street sleepers, crisis intervention through Integrated Family Service Centres.
+- Medical Fee Waiver: For CSSA recipients and low-income individuals, covers public hospital/clinic fees.
 `;
 
-const SYSTEM_PROMPT = `You are a Hong Kong Welfare Policy Expert AI assistant. Your role is to analyze user input, identify which welfare category applies, and determine what information is still needed.
+const SYSTEM_PROMPT = `You are a Hong Kong Welfare Policy Expert AI assistant. Your job is to carefully analyze the user's situation — even when described in long, complex, or emotional language — and determine which welfare programs they may qualify for.
 
 ${HK_WELFARE_KNOWLEDGE}
 
-You MUST respond with a valid JSON object in this exact format (no markdown, no code fences):
-{
-  "category": "string - the welfare category (e.g. 'Elderly', 'Housing', 'Disability', 'Family', 'Transport', 'General')",
-  "thought_process": "string - your internal reasoning about the user's situation and eligibility",
-  "reply_text": "string - a friendly, helpful message to the user in the same language they used",
-  "missing_fields": ["array of field names still needed, e.g. 'age', 'income', 'rent', 'household_size'. Empty array if all info is sufficient"]
-}
+Instructions:
+1. Read the user's ENTIRE message carefully. Extract ALL relevant details: age, income, housing status, family situation, disabilities, employment, health issues, etc.
+2. Cross-reference extracted details against ALL welfare programs above. A user may qualify for MULTIPLE programs simultaneously.
+3. Identify what critical information is still missing to make a proper assessment.
+4. Respond warmly in the SAME LANGUAGE the user writes in. Default to English if unclear.
+5. When the user describes a severe or urgent situation (e.g. homelessness, zero income, elderly alone), prioritize the most critical programs first and be extra empathetic.
+6. For complex cases, break down your analysis clearly — don't just list programs, explain WHY each one applies.
 
-Rules:
-- If the user provides enough info, set missing_fields to an empty array and provide a recommendation in reply_text.
-- If info is missing, list ONLY the fields relevant to the identified category.
-- Always be warm, professional, and encouraging.
-- Respond in the same language the user writes in. Default to English if unclear.
-- NEVER wrap JSON in markdown code fences.`;
+You MUST call the "analyze_welfare" function with your structured analysis.`;
+
+// Tool definition for structured output
+const WELFARE_TOOL = {
+  type: 'function',
+  function: {
+    name: 'analyze_welfare',
+    description: 'Analyze user welfare eligibility and return structured assessment',
+    parameters: {
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          description: 'Primary welfare category: Elderly, Housing, Disability, Family, Transport, Employment, Emergency, or General',
+        },
+        thought_process: {
+          type: 'string',
+          description: 'Detailed internal reasoning about the user situation, what programs apply and why, at least 2-3 sentences',
+        },
+        reply_text: {
+          type: 'string',
+          description: 'A warm, helpful message to the user in their language. For complex situations, acknowledge their difficulties and explain which programs may help and why. Be specific and actionable.',
+        },
+        missing_fields: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Fields still needed for assessment. Use these exact names: age, income, rent, household_size, name, district, employment_status, disability_type, working_hours, transport_expense, assets, residency_years, date_of_birth, marital_status, housing. Return empty array [] if enough info is provided.',
+        },
+      },
+      required: ['category', 'thought_process', 'reply_text', 'missing_fields'],
+    },
+  },
+};
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -74,8 +103,8 @@ Respond with a valid JSON array (no markdown, no code fences). Each element:
   "index": <original 0-based index>,
   "name": "<office name>",
   "distance_km": <number, estimated km>,
-  "distance_label": "<e.g. '约2.5公里' or '~2.5 km'>",
-  "transport_suggestion": "<short suggestion like '乘港铁到长沙湾站步行5分钟' or 'Take MTR to Cheung Sha Wan, 5 min walk'>"
+  "distance_label": "<e.g. '~2.5 km'>",
+  "transport_suggestion": "<short suggestion like 'Take MTR to Cheung Sha Wan, 5 min walk'>"
 }
 
 Sort the array by distance_km ascending. Be as accurate as possible based on Hong Kong geography.`;
@@ -120,7 +149,7 @@ Sort the array by distance_km ascending. Be as accurate as possible based on Hon
       });
     }
 
-    // ── Default: welfare chat ──
+    // ── Default: welfare chat with tool calling ──
     const { userMessage, profile, conversationHistory } = body;
 
     if (!userMessage || typeof userMessage !== 'string') {
@@ -131,7 +160,7 @@ Sort the array by distance_km ascending. Be as accurate as possible based on Hon
     }
 
     const profileContext = profile && Object.keys(profile).length > 0
-      ? `\n\nKnown user profile: ${JSON.stringify(profile)}`
+      ? `\n\nKnown user profile so far: ${JSON.stringify(profile)}`
       : '';
 
     const messages = [
@@ -139,6 +168,8 @@ Sort the array by distance_km ascending. Be as accurate as possible based on Hon
       ...(conversationHistory || []).slice(-10),
       { role: 'user', content: userMessage },
     ];
+
+    console.log('[deepseek-proxy] Sending request with tool calling, message length:', userMessage.length);
 
     const response = await fetch(DEEPSEEK_API_URL, {
       method: 'POST',
@@ -150,12 +181,15 @@ Sort the array by distance_km ascending. Be as accurate as possible based on Hon
         model: 'deepseek-chat',
         messages,
         temperature: 0.3,
-        max_tokens: 1024,
+        max_tokens: 2048,
+        tools: [WELFARE_TOOL],
+        tool_choice: { type: 'function', function: { name: 'analyze_welfare' } },
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('[deepseek-proxy] API error:', response.status, errorText);
       return new Response(
         JSON.stringify({ error: `DeepSeek API error (${response.status}): ${errorText}` }),
         { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -163,32 +197,59 @@ Sort the array by distance_km ascending. Be as accurate as possible based on Hon
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content?.trim();
+    const choice = data.choices?.[0];
 
-    if (!content) {
-      return new Response(
-        JSON.stringify({ error: 'Empty response from DeepSeek' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
+    // Try to extract from tool call first
     let parsed;
-    try {
-      const cleaned = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
-      parsed = JSON.parse(cleaned);
-    } catch {
-      parsed = {
-        category: 'General',
-        thought_process: 'Could not parse structured response. Returning raw text.',
-        reply_text: content,
-        missing_fields: [],
-      };
+    const toolCall = choice?.message?.tool_calls?.[0];
+    if (toolCall?.function?.arguments) {
+      try {
+        parsed = JSON.parse(toolCall.function.arguments);
+        console.log('[deepseek-proxy] Successfully parsed tool call response, category:', parsed.category);
+      } catch (e) {
+        console.error('[deepseek-proxy] Failed to parse tool call arguments:', e);
+      }
     }
+
+    // Fallback: try parsing content as JSON (in case model ignores tool calling)
+    if (!parsed) {
+      const content = choice?.message?.content?.trim();
+      if (content) {
+        try {
+          const cleaned = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+          parsed = JSON.parse(cleaned);
+          console.log('[deepseek-proxy] Fallback: parsed from content JSON');
+        } catch {
+          // Last resort: return raw text as reply
+          parsed = {
+            category: 'General',
+            thought_process: 'Model returned unstructured text. Using as-is.',
+            reply_text: content,
+            missing_fields: [],
+          };
+          console.log('[deepseek-proxy] Fallback: using raw content as reply_text');
+        }
+      } else {
+        parsed = {
+          category: 'General',
+          thought_process: 'Empty response from model.',
+          reply_text: 'I apologize, I could not process your request. Please try describing your situation again.',
+          missing_fields: [],
+        };
+      }
+    }
+
+    // Validate the response structure
+    if (!parsed.category) parsed.category = 'General';
+    if (!parsed.thought_process) parsed.thought_process = '';
+    if (!parsed.reply_text) parsed.reply_text = 'I apologize, something went wrong. Please try again.';
+    if (!Array.isArray(parsed.missing_fields)) parsed.missing_fields = [];
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
+    console.error('[deepseek-proxy] Unhandled error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
