@@ -301,6 +301,8 @@ const DocPrepChat = () => {
     setTimeout(() => {
       setBookingState('booked');
       addTerminalLog(`[Booking] ✓ Appointment confirmed at ${officeName}.`);
+      // Auto-check the first step item ("前往社会保障办事处提交申请") in Journey panel
+      updateProgramProgress(programId, 'step-0');
     }, 2500);
   };
 
