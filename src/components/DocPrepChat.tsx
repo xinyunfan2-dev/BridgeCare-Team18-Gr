@@ -142,7 +142,7 @@ const DocPrepChat = () => {
 
   // Fetch ranked offices when completed
   useEffect(() => {
-    if (!session || session.status !== 'completed') return;
+    if (!session || !zipDownloaded) return;
     const officeData = PROGRAM_OFFICE_DATA[session.programId];
     if (!officeData || !session.userInfo.address || rankedOffices.length > 0 || isRanking) return;
 
