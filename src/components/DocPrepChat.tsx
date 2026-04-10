@@ -169,7 +169,7 @@ const DocPrepChat = () => {
       }
     };
     fetchRanking();
-  }, [session?.status, session?.programId, session?.userInfo.address]);
+  }, [zipDownloaded, session?.programId, session?.userInfo.address]);
 
   if (!docPrepSession) return null;
 
