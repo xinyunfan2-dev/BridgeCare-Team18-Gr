@@ -193,7 +193,8 @@ const DocPrepChat = () => {
     try {
       const imageDataUrl = await readFileAsDataUrl(file);
       const pdfBlob = await generatePDF(docLabel, userName, imageDataUrl);
-      const fileName = `${docLabel} - ${userName}.pdf`;
+      const safeDocLabel = docLabel.replace(/\//g, '-');
+      const fileName = `${safeDocLabel} - ${userName}.pdf`;
 
       const prepDoc: PreparedDocument = { docLabel, fileName, pdfBlob, imageDataUrl };
       addPreparedDoc(prepDoc);
