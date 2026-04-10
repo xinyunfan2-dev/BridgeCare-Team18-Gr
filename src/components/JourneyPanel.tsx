@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks, Play } from 'lucide-react';
@@ -27,7 +28,19 @@ const statusColors: Record<string, string> = {
 };
 
 const JourneyPanel = () => {
-  const { journeyApplications, updateProgramProgress, userProfile, startDocPrep, docPrepSession, addChatMessage, addTerminalLog } = useWelfare();
+  const { journeyApplications, updateProgramProgress, userProfile, startDocPrep, docPrepSession, addChatMessage, addTerminalLog, activeStep, completeStep } = useWelfare();
+
+  // Auto-advance to Journey step when all application steps are completed
+  useEffect(() => {
+    if (activeStep !== 3) return; // only when on Action step
+    if (journeyApplications.length === 0) return;
+    const allDone = journeyApplications.every(p =>
+      p.checklist.length > 0 && p.checklist.every(c => c.completed)
+    );
+    if (allDone) {
+      completeStep(3);
+    }
+  }, [journeyApplications, activeStep, completeStep]);
 
   const handleStartDocPrep = (programId: string, programName: string) => {
     const docs = PROGRAM_DOCS[programId] || ['HK ID Card', 'Proof of Address', 'Income / Asset Proof'];
