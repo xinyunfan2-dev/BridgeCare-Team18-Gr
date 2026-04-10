@@ -49,7 +49,79 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { userMessage, profile, conversationHistory } = await req.json();
+    const body = await req.json();
+    const { action } = body;
+
+    // ── Branch: rank offices by distance ──
+    if (action === 'rank_offices') {
+      const { userAddress, offices } = body;
+      if (!userAddress || !offices) {
+        return new Response(
+          JSON.stringify({ error: 'userAddress and offices are required' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const rankPrompt = `You are a Hong Kong geography expert. Given a user's residential address and a list of government offices, estimate the approximate distance (in km) from the user's home to each office, and rank them from nearest to farthest.
+
+User's Address: "${userAddress}"
+
+Offices:
+${offices.map((o: any, i: number) => `${i + 1}. ${o.name} — ${o.address}`).join('\n')}
+
+Respond with a valid JSON array (no markdown, no code fences). Each element:
+{
+  "index": <original 0-based index>,
+  "name": "<office name>",
+  "distance_km": <number, estimated km>,
+  "distance_label": "<e.g. '约2.5公里' or '~2.5 km'>",
+  "transport_suggestion": "<short suggestion like '乘港铁到长沙湾站步行5分钟' or 'Take MTR to Cheung Sha Wan, 5 min walk'>"
+}
+
+Sort the array by distance_km ascending. Be as accurate as possible based on Hong Kong geography.`;
+
+      const response = await fetch(DEEPSEEK_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: 'You are a Hong Kong geography and transit expert. Always respond with valid JSON only, no markdown.' },
+            { role: 'user', content: rankPrompt },
+          ],
+          temperature: 0.2,
+          max_tokens: 1024,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        return new Response(
+          JSON.stringify({ error: `DeepSeek API error (${response.status}): ${errorText}` }),
+          { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content?.trim();
+      let parsed;
+      try {
+        const cleaned = content.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        parsed = [];
+      }
+
+      return new Response(JSON.stringify({ ranked_offices: parsed }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ── Default: welfare chat ──
+    const { userMessage, profile, conversationHistory } = body;
 
     if (!userMessage || typeof userMessage !== 'string') {
       return new Response(

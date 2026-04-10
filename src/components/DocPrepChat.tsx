@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, Bot, MapPin, Clock, ExternalLink, CalendarCheck, Loader2 } from 'lucide-react';
+import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, Bot, MapPin, Clock, ExternalLink, CalendarCheck, Loader2, Navigation } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
 import { PreparedDocument, UserInfo } from '@/types/welfare';
+import { supabase } from '@/integrations/supabase/client';
 
 /* ── Office & appointment data per program ── */
 interface OfficeInfo {
@@ -114,6 +115,14 @@ const PROGRAM_OFFICE_DATA: Record<string, ProgramOfficeData> = {
   },
 };
 
+interface RankedOffice {
+  index: number;
+  name: string;
+  distance_km: number;
+  distance_label: string;
+  transport_suggestion: string;
+}
+
 const DocPrepChat = () => {
   const {
     docPrepSession, setDocPrepUserInfo, addPreparedDoc, advanceDocPrep,
@@ -124,7 +133,42 @@ const DocPrepChat = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked'>('idle');
   const [bookedOfficeName, setBookedOfficeName] = useState('');
+  const [rankedOffices, setRankedOffices] = useState<RankedOffice[]>([]);
+  const [isRanking, setIsRanking] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const session = docPrepSession;
+
+  // Fetch ranked offices when completed
+  useEffect(() => {
+    if (!session || session.status !== 'completed') return;
+    const officeData = PROGRAM_OFFICE_DATA[session.programId];
+    if (!officeData || !session.userInfo.address || rankedOffices.length > 0 || isRanking) return;
+
+    const fetchRanking = async () => {
+      setIsRanking(true);
+      addTerminalLog('[Office] 正在通过 AI 分析最近的办事处...');
+      try {
+        const { data, error } = await supabase.functions.invoke('deepseek-proxy', {
+          body: {
+            action: 'rank_offices',
+            userAddress: session.userInfo.address,
+            offices: officeData.offices.map(o => ({ name: o.name, address: o.address })),
+          },
+        });
+        if (error) throw error;
+        if (data?.ranked_offices?.length) {
+          setRankedOffices(data.ranked_offices);
+          addTerminalLog(`[Office] ✓ 已按距离排序 ${data.ranked_offices.length} 个办事处。`);
+        }
+      } catch (err) {
+        addTerminalLog(`[Office] 排序失败: ${err}`);
+      } finally {
+        setIsRanking(false);
+      }
+    };
+    fetchRanking();
+  }, [session?.status, session?.programId, session?.userInfo.address]);
 
   if (!docPrepSession) return null;
 
@@ -376,54 +420,84 @@ const DocPrepChat = () => {
                   </p>
                 </div>
 
-                {/* Offices list */}
-                {officeData.offices.map((office, i) => (
-                  <div key={i} className="rounded-xl border bg-accent/5 p-3 space-y-2">
-                    <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                      {office.name}
-                    </p>
-                    <div className="ml-5 space-y-1 text-xs text-foreground/80">
-                      <p className="flex items-start gap-1.5">
-                        <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
-                        {office.address}
-                      </p>
-                      <p className="flex items-start gap-1.5">
-                        <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
-                        {office.officeHours}
-                      </p>
-                      <p>📞 Tel: {office.phone}</p>
-                      {office.walkInNote && (
-                        <p className="text-muted-foreground italic">ℹ️ {office.walkInNote}</p>
-                      )}
-                    </div>
+                {/* Loading ranking */}
+                {isRanking && (
+                  <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 flex items-center gap-2 animate-pulse">
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    <p className="text-xs text-foreground/80">正在根据您的地址「{docPrepSession.userInfo.address}」查找最近的办事处...</p>
+                  </div>
+                )}
 
-                    {/* Online booking URL + fake booking button */}
-                    {office.onlineBookingUrl && (
-                      <div className="ml-5 flex flex-col gap-1.5 mt-1">
-                        <a
-                          href={office.onlineBookingUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          Online Portal: {office.onlineBookingUrl}
-                        </a>
-                        {bookingState === 'idle' && (
-                          <Button
-                            variant="outline" size="sm"
-                            className="rounded-full gap-1.5 text-xs w-fit"
-                            onClick={() => handleFakeBooking(office.name)}
-                          >
-                            <CalendarCheck className="w-3 h-3" />
-                            Book Appointment Online
-                          </Button>
+                {/* Offices list — sorted by distance if available */}
+                {(() => {
+                  const sortedOffices = rankedOffices.length > 0
+                    ? rankedOffices.map(r => ({ ...officeData.offices[r.index], _ranked: r }))
+                    : officeData.offices.map(o => ({ ...o, _ranked: null as RankedOffice | null }));
+
+                  return sortedOffices.map((office, i) => (
+                    <div key={i} className="rounded-xl border bg-accent/5 p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                          {office.name}
+                        </p>
+                        {office._ranked && (
+                          <span className="flex items-center gap-1 text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full whitespace-nowrap">
+                            <Navigation className="w-3 h-3" />
+                            {office._ranked.distance_label}
+                          </span>
                         )}
                       </div>
-                    )}
-                  </div>
-                ))}
+                      {i === 0 && office._ranked && (
+                        <p className="text-xs font-medium text-primary ml-5">⭐ 距离您最近的办事处</p>
+                      )}
+                      <div className="ml-5 space-y-1 text-xs text-foreground/80">
+                        <p className="flex items-start gap-1.5">
+                          <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
+                          {office.address}
+                        </p>
+                        <p className="flex items-start gap-1.5">
+                          <Clock className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-0.5" />
+                          {office.officeHours}
+                        </p>
+                        <p>📞 Tel: {office.phone}</p>
+                        {office._ranked?.transport_suggestion && (
+                          <p className="flex items-start gap-1.5 text-primary/80">
+                            🚇 {office._ranked.transport_suggestion}
+                          </p>
+                        )}
+                        {office.walkInNote && (
+                          <p className="text-muted-foreground italic">ℹ️ {office.walkInNote}</p>
+                        )}
+                      </div>
+
+                      {/* Online booking URL + fake booking button */}
+                      {office.onlineBookingUrl && (
+                        <div className="ml-5 flex flex-col gap-1.5 mt-1">
+                          <a
+                            href={office.onlineBookingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline flex items-center gap-1"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            Online Portal: {office.onlineBookingUrl}
+                          </a>
+                          {bookingState === 'idle' && (
+                            <Button
+                              variant="outline" size="sm"
+                              className="rounded-full gap-1.5 text-xs w-fit"
+                              onClick={() => handleFakeBooking(office.name)}
+                            >
+                              <CalendarCheck className="w-3 h-3" />
+                              Book Appointment Online
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ));
+                })()}
 
                 {/* Booking animation */}
                 {bookingState === 'booking' && (
