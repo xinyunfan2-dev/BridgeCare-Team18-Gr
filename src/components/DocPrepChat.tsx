@@ -6,7 +6,6 @@ import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, 
 import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
 import { PreparedDocument } from '@/types/welfare';
-import { PreparedDocument } from '@/types/welfare';
 
 const DocPrepChat = () => {
   const {
