@@ -196,6 +196,8 @@ const DocPrepChat = () => {
 
       const prepDoc: PreparedDocument = { docLabel, fileName, pdfBlob, imageDataUrl };
       addPreparedDoc(prepDoc);
+      // Auto-check the corresponding doc item in Journey panel
+      updateProgramProgress(programId, `doc-${currentDocIndex}`);
       advanceDocPrep();
       addTerminalLog(`[DocPrep] ✓ "${fileName}" 已生成。`);
     } catch (err) {
