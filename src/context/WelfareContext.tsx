@@ -92,8 +92,12 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
     setJourneyApplications(prev =>
       prev.map(p => {
         if (p.id !== programId) return p;
+        const now = new Date();
+        const dateStr = `${now.getMonth() + 1}/${now.getDate()}`;
         const checklist = p.checklist.map(c =>
-          c.id === checklistItemId ? { ...c, completed: !c.completed } : c
+          c.id === checklistItemId
+            ? { ...c, completed: !c.completed, completedAt: !c.completed ? dateStr : undefined }
+            : c
         );
         const completed = checklist.filter(c => c.completed).length;
         const progress = Math.round((completed / checklist.length) * 100);

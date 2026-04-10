@@ -30,6 +30,8 @@ export interface ChecklistItem {
   id: string;
   label: string;
   completed: boolean;
+  completedAt?: string;
+  category: 'doc' | 'step';
 }
 
 export interface WelfareProgram {

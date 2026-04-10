@@ -49,16 +49,24 @@ const WelfareCardList = ({ cards }: WelfareCardListProps) => {
 
   const handleConfirmAdd = (card: WelfareCard) => {
     const info = PROGRAM_INFO[card.id] || DEFAULT_INFO;
+    const docItems = info.docs.map((doc, i) => ({
+      id: `doc-${i}`,
+      label: `准备: ${doc}`,
+      completed: false,
+      category: 'doc' as const,
+    }));
+    const stepItems = info.timeline.map((step, i) => ({
+      id: `step-${i}`,
+      label: step,
+      completed: false,
+      category: 'step' as const,
+    }));
     addProgram({
       id: card.id,
       name: card.name,
       status: 'not_started',
       progress: 0,
-      checklist: info.docs.map((doc, i) => ({
-        id: `doc-${i}`,
-        label: `准备: ${doc}`,
-        completed: false,
-      })),
+      checklist: [...docItems, ...stepItems],
     });
     addTerminalLog(`[Journey] 用户确认申请 "${card.name}"，已添加到 Journey。`);
     setActiveStep(3);
