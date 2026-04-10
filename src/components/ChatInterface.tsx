@@ -150,9 +150,11 @@ const ChatInterface = () => {
             onClick={handleNewInquiry}
             className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center hover:bg-accent transition-colors text-muted-foreground"
             title="New inquiry"
+            aria-label="New inquiry"
           >
             <Plus className="w-4.5 h-4.5" />
           </button>
+
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
