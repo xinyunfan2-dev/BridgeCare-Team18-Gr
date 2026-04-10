@@ -47,7 +47,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
 
     // Now search for welfare programs using Exa
     try {
-      addTerminalLog('[Exa] 正在搜索香港福利资源...');
+      addTerminalLog('[Exa] Searching HK welfare resources...');
 
       // Determine search queries based on user profile
       const updatedProfile = { ...userProfile, ...parsed };
@@ -56,7 +56,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
       const allCards: WelfareCard[] = [];
 
       for (const query of searchQueries) {
-        addTerminalLog(`[Exa] 搜索: "${query.name}"...`);
+        addTerminalLog(`[Exa] Searching: "${query.name}"...`);
         const resources = await searchWelfareResources(query.name);
         allCards.push({
           id: query.id,
@@ -75,7 +75,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
           id: Date.now().toString(),
           role: 'agent',
           type: 'text',
-          content: '根据您提供的信息，以下是您可能符合资格的福利项目。点击卡片即可开始申请流程：',
+          content: 'Based on your information, here are the welfare programs you may be eligible for. Click on a card to begin the application process:',
           timestamp: new Date(),
         };
         addChatMessage(introMsg);
@@ -88,25 +88,25 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
           timestamp: new Date(),
         };
         addChatMessage(cardsMsg);
-        addTerminalLog(`[Exa] 找到 ${allCards.length} 个适用福利项目。`);
+        addTerminalLog(`[Exa] Found ${allCards.length} applicable welfare programs.`);
       } else {
         const fallbackMsg: ChatMessage = {
           id: Date.now().toString(),
           role: 'agent',
           type: 'text',
-          content: '感谢您的信息。我正在为您匹配适合的福利项目，请稍后再试。',
+          content: 'Thank you for your information. I am matching suitable welfare programs for you, please try again later.',
           timestamp: new Date(),
         };
         addChatMessage(fallbackMsg);
       }
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      addTerminalLog(`[Error] Exa 搜索失败: ${errMsg}`);
+      addTerminalLog(`[Error] Exa search failed: ${errMsg}`);
       const fallback: ChatMessage = {
         id: Date.now().toString(),
         role: 'agent',
         type: 'text',
-        content: '感谢您提供的信息。搜索暂时出现问题，请稍后再试。',
+        content: 'Thank you for your information. Search encountered an issue, please try again later.',
         timestamp: new Date(),
       };
       addChatMessage(fallback);
