@@ -114,7 +114,7 @@ const DocPrepChat = () => {
     });
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, `${folderName}.zip`);
+    downloadBlob(zipBlob, `${folderName}.zip`);
     addTerminalLog(`[DocPrep] ✓ "${folderName}.zip" 已下载。`);
 
     addChatMessage({
