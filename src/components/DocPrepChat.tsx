@@ -408,7 +408,7 @@ const DocPrepChat = () => {
             </div>
 
             {/* Office & appointment info */}
-            {officeData && (
+            {officeData && zipDownloaded && (
               <div className="space-y-4">
                 <div className="flex items-start gap-2">
                   <Bot className="w-4 h-4 text-primary mt-0.5" />
