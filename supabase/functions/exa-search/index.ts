@@ -54,9 +54,9 @@ Deno.serve(async (req) => {
 
     const results = (data.results || []).map((res: any) => ({
       id: res.id,
-      title: res.title || `${query} 相关资讯`,
+      title: res.title || `${query} - Related Info`,
       url: res.url,
-      snippet: res.highlights?.[0] || '点击查看官方申请详情及办事处地址。',
+      snippet: res.highlights?.[0] || 'Click to view official application details and office addresses.',
       category: query,
     }));
 

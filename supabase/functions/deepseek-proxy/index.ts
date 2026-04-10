@@ -32,7 +32,7 @@ Rules:
 - If the user provides enough info, set missing_fields to an empty array and provide a recommendation in reply_text.
 - If info is missing, list ONLY the fields relevant to the identified category.
 - Always be warm, professional, and encouraging.
-- Respond in the same language the user writes in (English or Chinese).
+- Respond in the same language the user writes in. Default to English if unclear.
 - NEVER wrap JSON in markdown code fences.`;
 
 Deno.serve(async (req) => {

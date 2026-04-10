@@ -126,7 +126,7 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
       preparedDocs: [],
       status: 'asking_info',
     });
-    addTerminalLog(`[DocPrep] 开始为 "${programName}" 准备申请文件。`);
+    addTerminalLog(`[DocPrep] Starting document preparation for "${programName}".`);
   }, [addTerminalLog]);
 
   const setDocPrepUserInfo = useCallback((info: import('@/types/welfare').UserInfo) => {

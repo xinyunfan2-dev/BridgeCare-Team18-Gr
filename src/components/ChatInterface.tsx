@@ -25,13 +25,13 @@ const ChatInterface = () => {
 
   const processWithAI = async (messageText: string) => {
     setIsThinking(true);
-    addTerminalLog('[Agent] 正在分析用户意图...');
+    addTerminalLog('[Agent] Analyzing user intent...');
 
     try {
       const result = await callDeepSeek(messageText, userProfile, conversationHistory);
 
-      addTerminalLog(`[Agent] 分类: ${result.category}`);
-      addTerminalLog(`[Agent] 思考: ${result.thought_process.slice(0, 120)}...`);
+      addTerminalLog(`[Agent] Category: ${result.category}`);
+      addTerminalLog(`[Agent] Reasoning: ${result.thought_process.slice(0, 120)}...`);
 
       // Always show a brief reply text first
       const replyMsg: ChatMessage = {
@@ -50,26 +50,26 @@ const ChatInterface = () => {
           id: (Date.now() + 1).toString(),
           role: 'agent',
           type: 'form_request',
-          formTitle: `请填写以下信息`,
+          formTitle: `Please fill in the following`,
           fields: formFields,
           timestamp: new Date(),
         };
         addChatMessage(formMsg);
-        addTerminalLog(`[Agent] 需要补充: ${result.missing_fields.join(', ')}。表单已生成。`);
+        addTerminalLog(`[Agent] Missing fields: ${result.missing_fields.join(', ')}. Form generated.`);
         setActiveStep(1); // Profile step
       } else {
-        addTerminalLog('[Agent] 信息充足，可直接推荐。');
+        addTerminalLog('[Agent] Sufficient info, ready to recommend.');
         setActiveStep(2);
       }
     } catch (error) {
       const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      addTerminalLog(`[Error] DeepSeek 调用失败: ${errMsg}`);
+      addTerminalLog(`[Error] DeepSeek call failed: ${errMsg}`);
 
       const fallback: ChatMessage = {
         id: Date.now().toString(),
         role: 'agent',
         type: 'text',
-        content: `抱歉，处理您的请求时出现问题，请重试。(${errMsg})`,
+        content: `Sorry, something went wrong processing your request. Please try again. (${errMsg})`,
         timestamp: new Date(),
       };
       addChatMessage(fallback);
@@ -157,7 +157,7 @@ const ChatInterface = () => {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && send()}
-            placeholder="描述您的情况，例如：我是65岁退休老人..."
+            placeholder="Describe your situation, e.g.: I'm a 65-year-old retiree..."
             disabled={isThinking}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
           />
