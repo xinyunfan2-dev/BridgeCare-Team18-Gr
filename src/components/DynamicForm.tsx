@@ -43,7 +43,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
     updateProfile(parsed);
     markFormSubmitted(messageId);
     completeStep(activeStep);
-    addTerminalLog('[Data] 用户资料已更新。正在搜索适用的福利项目...');
+    addTerminalLog('[Data] User profile updated. Searching applicable welfare programs...');
 
     // Now search for welfare programs using Exa
     try {
@@ -139,11 +139,11 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="w-3.5 h-3.5 animate-spin" /> 搜索福利项目中...
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Searching welfare programs...
           </>
         ) : (
           <>
-            <Check className="w-3.5 h-3.5" /> 提交
+            <Check className="w-3.5 h-3.5" /> Submit
           </>
         )}
       </Button>
