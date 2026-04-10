@@ -116,7 +116,7 @@ const DynamicForm = ({ messageId, title, fields }: DynamicFormProps) => {
   };
 
   return (
-    <div className="rounded-2xl border border-primary/15 bg-background p-4 space-y-3 max-w-md px-[16px]">
+    <div className="rounded-2xl border border-primary/15 bg-background p-5 space-y-4 w-full max-w-2xl">
       {title && <p className="text-sm font-semibold text-foreground">{title}</p>}
       {fields.map(field => (
         <div key={field.name} className="space-y-1">
