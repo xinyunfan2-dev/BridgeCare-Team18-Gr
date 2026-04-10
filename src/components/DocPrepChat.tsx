@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, Bot, MapPin, Clock, ExternalLink, CalendarCheck, Loader2 } from 'lucide-react';
+import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, Bot, MapPin, Clock, ExternalLink, CalendarCheck, Loader2, Navigation } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
 import { PreparedDocument, UserInfo } from '@/types/welfare';
+import { supabase } from '@/integrations/supabase/client';
 
 /* ── Office & appointment data per program ── */
 interface OfficeInfo {
