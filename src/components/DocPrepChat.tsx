@@ -132,6 +132,7 @@ const DocPrepChat = () => {
   const [infoForm, setInfoForm] = useState<UserInfo>({ name: '', hkid: '', phone: '', address: '', email: '' });
   const [isGenerating, setIsGenerating] = useState(false);
   const [bookingState, setBookingState] = useState<'idle' | 'booking' | 'booked'>('idle');
+  const [zipDownloaded, setZipDownloaded] = useState(false);
   const [bookedOfficeName, setBookedOfficeName] = useState('');
   const [rankedOffices, setRankedOffices] = useState<RankedOffice[]>([]);
   const [isRanking, setIsRanking] = useState(false);
@@ -141,7 +142,7 @@ const DocPrepChat = () => {
 
   // Fetch ranked offices when completed
   useEffect(() => {
-    if (!session || session.status !== 'completed') return;
+    if (!session || !zipDownloaded) return;
     const officeData = PROGRAM_OFFICE_DATA[session.programId];
     if (!officeData || !session.userInfo.address || rankedOffices.length > 0 || isRanking) return;
 
@@ -168,7 +169,7 @@ const DocPrepChat = () => {
       }
     };
     fetchRanking();
-  }, [session?.status, session?.programId, session?.userInfo.address]);
+  }, [zipDownloaded, session?.programId, session?.userInfo.address]);
 
   if (!docPrepSession) return null;
 
@@ -267,15 +268,7 @@ const DocPrepChat = () => {
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     downloadBlob(zipBlob, `${folderName}.zip`);
     addTerminalLog(`[DocPrep] ✓ "${folderName}.zip" downloaded.`);
-
-    addChatMessage({
-      id: Date.now().toString(),
-      role: 'agent',
-      type: 'text',
-      content: `✅ All application documents downloaded! Folder: "${folderName}"`,
-      timestamp: new Date(),
-    });
-    clearDocPrep();
+    setZipDownloaded(true);
   };
 
   const handleDownloadSingle = (doc: PreparedDocument) => {
@@ -415,7 +408,7 @@ const DocPrepChat = () => {
             </div>
 
             {/* Office & appointment info */}
-            {officeData && (
+            {officeData && zipDownloaded && (
               <div className="space-y-4">
                 <div className="flex items-start gap-2">
                   <Bot className="w-4 h-4 text-primary mt-0.5" />
