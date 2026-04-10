@@ -44,19 +44,22 @@ const ChatInterface = () => {
       addChatMessage(replyMsg);
 
       if (result.missing_fields && result.missing_fields.length > 0) {
-        // Show form to collect missing info
+        // Delay form appearance for natural flow
         const formFields = buildFieldsFromMissing(result.missing_fields);
-        const formMsg: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          role: 'agent',
-          type: 'form_request',
-          formTitle: `Please fill in the following`,
-          fields: formFields,
-          timestamp: new Date(),
-        };
-        addChatMessage(formMsg);
-        addTerminalLog(`[Agent] Missing fields: ${result.missing_fields.join(', ')}. Form generated.`);
-        setActiveStep(1); // Profile step
+        addTerminalLog(`[Agent] Missing fields: ${result.missing_fields.join(', ')}. Generating form...`);
+        setTimeout(() => {
+          const formMsg: ChatMessage = {
+            id: (Date.now() + 1).toString(),
+            role: 'agent',
+            type: 'form_request',
+            formTitle: `Please fill in the following`,
+            fields: formFields,
+            timestamp: new Date(),
+          };
+          addChatMessage(formMsg);
+          addTerminalLog(`[Agent] Form generated.`);
+          setActiveStep(1);
+        }, 1200);
       } else {
         addTerminalLog('[Agent] Sufficient info, ready to recommend.');
         setActiveStep(2);
