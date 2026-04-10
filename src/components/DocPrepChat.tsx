@@ -259,10 +259,9 @@ const DocPrepChat = () => {
 
     const zip = new JSZip();
     const folderName = `${programName} - ${userName} Application Documents`;
-    const folder = zip.folder(folderName)!;
 
     preparedDocs.forEach(doc => {
-      folder.file(doc.fileName, doc.pdfBlob);
+      zip.file(doc.fileName, doc.pdfBlob);
     });
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
