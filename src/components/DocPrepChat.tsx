@@ -268,15 +268,7 @@ const DocPrepChat = () => {
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     downloadBlob(zipBlob, `${folderName}.zip`);
     addTerminalLog(`[DocPrep] ✓ "${folderName}.zip" downloaded.`);
-
-    addChatMessage({
-      id: Date.now().toString(),
-      role: 'agent',
-      type: 'text',
-      content: `✅ All application documents downloaded! Folder: "${folderName}"`,
-      timestamp: new Date(),
-    });
-    clearDocPrep();
+    setZipDownloaded(true);
   };
 
   const handleDownloadSingle = (doc: PreparedDocument) => {
