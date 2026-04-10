@@ -139,10 +139,9 @@ const ChatInterface = () => {
             </div>
           </div>
         )}
+        {/* Doc Prep Chat - inside scroll area */}
+        <DocPrepChat />
       </div>
-
-      {/* Doc Prep Chat */}
-      <DocPrepChat />
 
       {/* Input */}
       <div className="px-6 pb-5 pt-2">

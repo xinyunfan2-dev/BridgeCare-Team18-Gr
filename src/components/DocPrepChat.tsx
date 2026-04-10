@@ -265,7 +265,7 @@ const DocPrepChat = () => {
         <span className="text-sm font-semibold text-foreground">Document Preparation - {programName}</span>
       </div>
 
-      <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+      <div className="p-4 space-y-4">
         {/* Step 1: Collect all user info */}
         {status === 'asking_info' && (
           <div className="space-y-3">
