@@ -1,7 +1,16 @@
 import { useWelfare } from '@/context/WelfareContext';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks } from 'lucide-react';
+import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+const PROGRAM_DOCS: Record<string, string[]> = {
+  cssa: ['香港身份证', '住址证明', '银行存折/月结单', '收入证明', '资产证明', '医疗报告'],
+  oala: ['香港身份证', '银行存折/月结单', '资产证明文件', '住址证明'],
+  'health-voucher': ['香港身份证'],
+  'public-housing': ['香港身份证', '住址证明', '收入及资产证明', '家庭成员关系证明', '申请表格HD274'],
+  wfa: ['香港身份证', '雇主证明/工作证明', '收入证明（粮单）', '银行存折', '住址证明'],
+};
 
 const statusLabels: Record<string, string> = {
   not_started: '未开始',
@@ -18,7 +27,20 @@ const statusColors: Record<string, string> = {
 };
 
 const JourneyPanel = () => {
-  const { journeyApplications, updateProgramProgress, userProfile } = useWelfare();
+  const { journeyApplications, updateProgramProgress, userProfile, startDocPrep, docPrepSession, addChatMessage, addTerminalLog } = useWelfare();
+
+  const handleStartDocPrep = (programId: string, programName: string) => {
+    const docs = PROGRAM_DOCS[programId] || ['香港身份证', '住址证明', '收入/资产证明'];
+    startDocPrep(programId, programName, docs);
+    addChatMessage({
+      id: Date.now().toString(),
+      role: 'agent',
+      type: 'text',
+      content: `📋 现在开始为您准备 "${programName}" 的申请文件。请在下方的文件准备助手中操作。`,
+      timestamp: new Date(),
+    });
+    addTerminalLog(`[DocPrep] 用户启动 "${programName}" 文件准备流程。`);
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -34,6 +56,7 @@ const JourneyPanel = () => {
           const docItems = program.checklist.filter(c => c.category === 'doc');
           const stepItems = program.checklist.filter(c => c.category === 'step');
           const allDocsCompleted = docItems.length > 0 && docItems.every(c => c.completed);
+          const isPrepping = docPrepSession?.programId === program.id;
 
           return (
             <div
@@ -54,6 +77,25 @@ const JourneyPanel = () => {
               </div>
 
               <Progress value={program.progress} className="h-1.5 rounded-full" />
+
+              {/* Start doc prep button */}
+              {!isPrepping && !docPrepSession && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full w-full gap-2 text-xs"
+                  onClick={() => handleStartDocPrep(program.id, program.name)}
+                >
+                  <Play className="w-3 h-3" />
+                  开始准备申请文件
+                </Button>
+              )}
+
+              {isPrepping && (
+                <div className="rounded-xl bg-primary/5 px-3 py-2 text-xs text-primary font-medium text-center">
+                  📝 文件准备中...请在聊天区域操作
+                </div>
+              )}
 
               {/* Document preparation section */}
               <div className="space-y-1">
