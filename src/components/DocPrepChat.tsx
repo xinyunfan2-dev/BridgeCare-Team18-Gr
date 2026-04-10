@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, Bot } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+import { PreparedDocument } from '@/types/welfare';
 import { PreparedDocument } from '@/types/welfare';
 
 const DocPrepChat = () => {
