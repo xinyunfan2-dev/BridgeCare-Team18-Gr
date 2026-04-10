@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Upload, FileText, Download, CheckCircle2, Image as ImageIcon, ArrowUp, Bot } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
 import { PreparedDocument } from '@/types/welfare';
 
 const DocPrepChat = () => {
@@ -114,7 +113,7 @@ const DocPrepChat = () => {
     });
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, `${folderName}.zip`);
+    downloadBlob(zipBlob, `${folderName}.zip`);
     addTerminalLog(`[DocPrep] ✓ "${folderName}.zip" 已下载。`);
 
     addChatMessage({
@@ -128,8 +127,19 @@ const DocPrepChat = () => {
   };
 
   const handleDownloadSingle = (doc: PreparedDocument) => {
-    saveAs(doc.pdfBlob, doc.fileName);
+    downloadBlob(doc.pdfBlob, doc.fileName);
     addTerminalLog(`[DocPrep] 下载: ${doc.fileName}`);
+  };
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
