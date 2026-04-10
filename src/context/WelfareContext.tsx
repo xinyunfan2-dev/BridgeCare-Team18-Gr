@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
-import { ChatMessage, UserProfile, WelfareProgram, STEPS } from '@/types/welfare';
+import { ChatMessage, UserProfile, WelfareProgram, DocPrepSession, PreparedDocument, STEPS } from '@/types/welfare';
 import { initialMessages, samplePrograms, initialTerminalLogs } from '@/data/mockData';
 
 interface WelfareState {
@@ -9,6 +9,7 @@ interface WelfareState {
   chatMessages: ChatMessage[];
   journeyApplications: WelfareProgram[];
   terminalLogs: string[];
+  docPrepSession: DocPrepSession | null;
   setActiveStep: (step: number) => void;
   completeStep: (step: number) => void;
   navigateBack: (step: number) => void;
@@ -18,6 +19,12 @@ interface WelfareState {
   addProgram: (program: WelfareProgram) => void;
   updateProgramProgress: (programId: string, checklistItemId: string) => void;
   addTerminalLog: (log: string) => void;
+  startDocPrep: (programId: string, programName: string, docs: string[]) => void;
+  setDocPrepUserName: (name: string) => void;
+  addPreparedDoc: (doc: PreparedDocument) => void;
+  advanceDocPrep: () => void;
+  completeDocPrep: () => void;
+  clearDocPrep: () => void;
 }
 
 const WelfareContext = createContext<WelfareState | null>(null);
@@ -35,6 +42,7 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(initialMessages);
   const [journeyApplications, setJourneyApplications] = useState<WelfareProgram[]>(samplePrograms);
   const [terminalLogs, setTerminalLogs] = useState<string[]>(initialTerminalLogs);
+  const [docPrepSession, setDocPrepSession] = useState<DocPrepSession | null>(null);
 
   const addTerminalLog = useCallback((log: string) => {
     const ts = new Date().toLocaleTimeString();
@@ -107,11 +115,52 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
     );
   }, []);
 
+  const startDocPrep = useCallback((programId: string, programName: string, docs: string[]) => {
+    setDocPrepSession({
+      programId,
+      programName,
+      userName: '',
+      docs,
+      currentDocIndex: 0,
+      preparedDocs: [],
+      status: 'asking_name',
+    });
+    addTerminalLog(`[DocPrep] 开始为 "${programName}" 准备申请文件。`);
+  }, [addTerminalLog]);
+
+  const setDocPrepUserName = useCallback((name: string) => {
+    setDocPrepSession(prev => prev ? { ...prev, userName: name, status: 'collecting_docs' } : prev);
+  }, []);
+
+  const addPreparedDoc = useCallback((doc: PreparedDocument) => {
+    setDocPrepSession(prev => prev ? { ...prev, preparedDocs: [...prev.preparedDocs, doc] } : prev);
+  }, []);
+
+  const advanceDocPrep = useCallback(() => {
+    setDocPrepSession(prev => {
+      if (!prev) return prev;
+      const nextIndex = prev.currentDocIndex + 1;
+      if (nextIndex >= prev.docs.length) {
+        return { ...prev, currentDocIndex: nextIndex, status: 'completed' };
+      }
+      return { ...prev, currentDocIndex: nextIndex };
+    });
+  }, []);
+
+  const completeDocPrep = useCallback(() => {
+    setDocPrepSession(prev => prev ? { ...prev, status: 'completed' } : prev);
+  }, []);
+
+  const clearDocPrep = useCallback(() => {
+    setDocPrepSession(null);
+  }, []);
+
   return (
     <WelfareContext.Provider value={{
-      activeStep, stepCompleted, userProfile, chatMessages, journeyApplications, terminalLogs,
+      activeStep, stepCompleted, userProfile, chatMessages, journeyApplications, terminalLogs, docPrepSession,
       setActiveStep, completeStep, navigateBack, updateProfile, addChatMessage, markFormSubmitted,
-      addProgram, updateProgramProgress, addTerminalLog,
+      addProgram, updateProgramProgress, addTerminalLog, startDocPrep, setDocPrepUserName,
+      addPreparedDoc, advanceDocPrep, completeDocPrep, clearDocPrep,
     }}>
       {children}
     </WelfareContext.Provider>

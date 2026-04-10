@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import DynamicForm from './DynamicForm';
 import WelfareCardList from './WelfareCardList';
+import DocPrepChat from './DocPrepChat';
 import { ChatMessage } from '@/types/welfare';
 import { Plus, ArrowUp, Bot, Loader2 } from 'lucide-react';
 import { callDeepSeek, buildFieldsFromMissing } from '@/services/deepseek';
@@ -139,6 +140,9 @@ const ChatInterface = () => {
           </div>
         )}
       </div>
+
+      {/* Doc Prep Chat */}
+      <DocPrepChat />
 
       {/* Input */}
       <div className="px-6 pb-5 pt-2">
