@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks, Play } from 'lucide-react';
+import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks, Play, Archive } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
