@@ -41,6 +41,7 @@ export interface WelfareProgram {
   progress: number;
   checklist: ChecklistItem[];
   icon?: string;
+  isPast?: boolean;
 }
 
 export interface UserProfile {

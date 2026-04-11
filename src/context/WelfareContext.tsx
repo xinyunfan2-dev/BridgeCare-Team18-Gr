@@ -25,6 +25,7 @@ interface WelfareState {
   advanceDocPrep: () => void;
   completeDocPrep: () => void;
   clearDocPrep: () => void;
+  startNewCycle: () => void;
 }
 
 const WelfareContext = createContext<WelfareState | null>(null);
@@ -156,12 +157,29 @@ export const WelfareProvider = ({ children }: { children: ReactNode }) => {
     setDocPrepSession(null);
   }, []);
 
+  const startNewCycle = useCallback(() => {
+    // Archive current non-past applications as past
+    setJourneyApplications(prev =>
+      prev.map(p => p.isPast ? p : { ...p, isPast: true })
+    );
+    // Reset steps
+    setActiveStepRaw(0);
+    setStepCompleted([false, false, false, false, false]);
+    // Reset chat
+    setChatMessages(initialMessages);
+    // Reset profile
+    setUserProfile({});
+    // Clear doc prep
+    setDocPrepSession(null);
+    addTerminalLog('[System] New cycle started. Previous applications archived.');
+  }, [addTerminalLog]);
+
   return (
     <WelfareContext.Provider value={{
       activeStep, stepCompleted, userProfile, chatMessages, journeyApplications, terminalLogs, docPrepSession,
       setActiveStep, completeStep, navigateBack, updateProfile, addChatMessage, markFormSubmitted,
       addProgram, updateProgramProgress, addTerminalLog, startDocPrep, setDocPrepUserInfo,
-      addPreparedDoc, advanceDocPrep, completeDocPrep, clearDocPrep,
+      addPreparedDoc, advanceDocPrep, completeDocPrep, clearDocPrep, startNewCycle,
     }}>
       {children}
     </WelfareContext.Provider>

@@ -14,20 +14,32 @@ import {
 import { useState } from 'react';
 
 const BreadcrumbStepper = () => {
-  const { activeStep, stepCompleted, navigateBack } = useWelfare();
+  const { activeStep, stepCompleted, navigateBack, startNewCycle } = useWelfare();
   const [confirmTarget, setConfirmTarget] = useState<number | null>(null);
+  const [isNewCycle, setIsNewCycle] = useState(false);
 
   const handleClick = (index: number) => {
     if (index === activeStep) return;
     if (index > activeStep) return; // forward locked
-    // backward: show confirmation
+    // If on Journey (step 4) and clicking Discovery (step 0), start new cycle
+    if (activeStep === 4 && index === 0) {
+      setIsNewCycle(true);
+      setConfirmTarget(index);
+      return;
+    }
+    setIsNewCycle(false);
     setConfirmTarget(index);
   };
 
   const confirmNavigation = () => {
     if (confirmTarget !== null) {
-      navigateBack(confirmTarget);
+      if (isNewCycle) {
+        startNewCycle();
+      } else {
+        navigateBack(confirmTarget);
+      }
       setConfirmTarget(null);
+      setIsNewCycle(false);
     }
   };
 
@@ -67,12 +79,16 @@ const BreadcrumbStepper = () => {
         })}
       </nav>
 
-      <AlertDialog open={confirmTarget !== null} onOpenChange={() => setConfirmTarget(null)}>
+      <AlertDialog open={confirmTarget !== null} onOpenChange={() => { setConfirmTarget(null); setIsNewCycle(false); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Go back to "{confirmTarget !== null ? STEPS[confirmTarget] : ''}"?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {isNewCycle ? 'Start a new inquiry?' : `Go back to "${confirmTarget !== null ? STEPS[confirmTarget] : ''}"?`}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Switching back will reset current progress. Continue?
+              {isNewCycle
+                ? 'Your current applications will be archived as past applications. You can start a new inquiry from scratch.'
+                : 'Switching back will reset current progress. Continue?'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

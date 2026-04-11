@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useWelfare } from '@/context/WelfareContext';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks, Play } from 'lucide-react';
+import { CheckCircle2, Circle, FileText, FolderOpen, ListChecks, Play, Archive } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -55,6 +55,9 @@ const JourneyPanel = () => {
     addTerminalLog(`[DocPrep] User started document preparation for "${programName}".`);
   };
 
+  const activeApps = journeyApplications.filter(p => !p.isPast);
+  const pastApps = journeyApplications.filter(p => p.isPast);
+
   return (
     <div className="h-full flex flex-col">
       <div className="px-5 py-4 border-b">
@@ -65,7 +68,8 @@ const JourneyPanel = () => {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {journeyApplications.map(program => {
+        {/* Active applications */}
+        {activeApps.map(program => {
           const docItems = program.checklist.filter(c => c.category === 'doc');
           const stepItems = program.checklist.filter(c => c.category === 'step');
           const allDocsCompleted = docItems.length > 0 && docItems.every(c => c.completed);
@@ -91,7 +95,6 @@ const JourneyPanel = () => {
 
               <Progress value={program.progress} className="h-1.5 rounded-full" />
 
-              {/* Start doc prep button */}
               {!isPrepping && !docPrepSession && (
                 <Button
                   variant="outline"
@@ -110,7 +113,6 @@ const JourneyPanel = () => {
                 </div>
               )}
 
-              {/* Document preparation section */}
               <div className="space-y-1">
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 px-2 pt-1">
                   <FolderOpen className="w-3 h-3" />
@@ -139,7 +141,6 @@ const JourneyPanel = () => {
                 ))}
               </div>
 
-              {/* Application steps section - only shows after all docs done */}
               {allDocsCompleted && stepItems.length > 0 && (
                 <div className="space-y-1 border-t pt-2">
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 px-2 pt-1">
@@ -173,7 +174,37 @@ const JourneyPanel = () => {
           );
         })}
 
-        {journeyApplications.length === 0 && (
+        {/* Past applications */}
+        {pastApps.length > 0 && (
+          <div className="space-y-2 pt-2">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 px-1">
+              <Archive className="w-3 h-3" />
+              Past Applications
+            </p>
+            {pastApps.map(program => (
+              <div
+                key={program.id}
+                className="rounded-2xl border bg-muted/30 p-3 space-y-2 opacity-70"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-xs font-medium text-muted-foreground">{program.name}</span>
+                  </div>
+                  <Badge
+                    variant="secondary"
+                    className="text-[10px] rounded-full px-2 py-0.5 border-0 bg-muted text-muted-foreground"
+                  >
+                    {statusLabels[program.status]}
+                  </Badge>
+                </div>
+                <Progress value={program.progress} className="h-1 rounded-full opacity-50" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {activeApps.length === 0 && pastApps.length === 0 && (
           <div className="text-center py-12">
             <p className="text-xs text-muted-foreground/60">No applications yet.<br />Start chatting to discover benefits.</p>
           </div>
