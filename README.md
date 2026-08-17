@@ -12,6 +12,88 @@ By allowing users to describe their situations through natural language conversa
 BridgeCare provides an end-to-end assistance workflow, allowing users to start from simple descriptions of their situations and receive guidance through welfare program discovery, document preparation, and application tracking.
 
 
+## Demo
+
+BridgeCare demonstrates an end-to-end AI-assisted welfare application workflow, starting from user needs discovery to document preparation and application tracking.
+
+The following scenario demonstrates how an unemployed Hong Kong resident uses BridgeCare to identify suitable welfare assistance and prepare application materials.
+
+
+## Scenario: Unemployed Resident Seeking Welfare Support
+
+
+### Step 1 — User Intent Understanding
+
+Users can describe their personal situations through natural language conversations.
+
+The AI agent analyzes the user's input, identifies the relevant welfare category, and determines the information required for further assessment.
+
+<img width="2376" height="1280" alt="02f331dbdfa81ab76fc0152f93dce8ed" src="https://github.com/user-attachments/assets/085f6c61-db50-47d2-8eef-013f86199d46" />
+
+
+---
+
+
+### Step 2 — Dynamic Profile Generation
+
+Based on the initial conversation, BridgeCare identifies missing user information and dynamically generates a structured profile form.
+
+The system converts unstructured user descriptions into structured information, including income, household details, housing status, and employment background.
+
+<img width="1280" height="1291" alt="96d37e82b81c57cf226233539cd4ed34" src="https://github.com/user-attachments/assets/7c70db9a-ba7d-4ce9-9110-9933befc0ed7" />
+
+
+---
+
+
+### Step 3 — Welfare Program Selection
+
+After collecting user information, BridgeCare retrieves relevant welfare resources and recommends potentially suitable assistance programs based on the user's profile.
+
+The AI agent combines user information with external information retrieval capabilities to provide personalized welfare guidance.
+
+<img width="1511" height="818" alt="image" src="https://github.com/user-attachments/assets/db10be07-468b-4466-ab3a-802e9a9a46fe" />
+
+
+---
+
+
+### Step 4 — Application Guidance
+
+BridgeCare provides detailed application guidance, including required documents, application procedures, and relevant resources.
+
+This helps users understand the next steps required to complete their welfare applications.
+
+<img width="1511" height="820" alt="image" src="https://github.com/user-attachments/assets/f091c921-023f-45fe-81dd-32cdcf67e68e" />
+
+
+---
+
+
+### Step 5 — Document Preparation and Generation
+
+After users select a welfare program, BridgeCare assists with document preparation by collecting required information and generating structured application documents.
+
+The system packages generated documents into downloadable files to simplify the submission process.
+
+<img width="1508" height="815" alt="image" src="https://github.com/user-attachments/assets/bcbfebf5-de86-4306-a5d4-beb0a3883a15" />
+
+<img width="1509" height="820" alt="image" src="https://github.com/user-attachments/assets/8491166e-bced-4c7c-8058-b0e2e8d30c99" />
+
+<img width="1325" height="879" alt="image" src="https://github.com/user-attachments/assets/b0ac5123-0528-4447-886f-bb2e7623036d" />
+
+
+---
+
+
+### Step 6 — Application Journey Tracking
+
+BridgeCare manages the complete application workflow through a journey dashboard.
+
+Users can monitor document preparation progress, track application steps, and manage their welfare application status.
+
+<img width="1511" height="816" alt="image" src="https://github.com/user-attachments/assets/6a116547-21d6-4f83-9ef8-4e5045063896" />
+
 
 ## Problem
 
