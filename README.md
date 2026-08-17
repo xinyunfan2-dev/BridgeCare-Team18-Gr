@@ -8,7 +8,7 @@ BridgeCare is an AI-powered assistant designed to help Hong Kong residents bette
 
 By allowing users to describe their situations through natural language conversations, BridgeCare analyzes user needs, recommends suitable welfare programs, provides document preparation guidance, generates pre-filled application documents, and supports the overall application journey.
 
-The end-to-end assistance workflow allows users to start with simple descriptions of their situations and receive completed document packages, including generated forms and supporting files required for welfare applications.
+BridgeCare provides an end-to-end assistance workflow, allowing users to start from simple descriptions of their situations and receive guidance through welfare program discovery, document preparation, and application tracking.
 
 
 ## Problem
@@ -95,35 +95,35 @@ The journey dashboard helps users organize application steps, monitor progress, 
 
 ### Frontend
 
-- React 18 — frontend framework for building interactive user interfaces
-- TypeScript — type-safe frontend development
-- Vite — development environment and build tool
-- Tailwind CSS — utility-based styling framework
-- shadcn/ui — reusable UI component library
+- React 18 
+- TypeScript
+- Vite 
+- Tailwind CSS 
+- shadcn/ui 
 
 ### Backend & Infrastructure
 
-- Supabase Edge Functions — serverless backend functions for securely handling API requests and connecting external services
+- Supabase Edge Functions 
 
 ### AI Services
 
-- DeepSeek API — conversational AI and natural language understanding
-- Exa Search API — information retrieval for welfare-related resources
+- DeepSeek API
+- Exa Search API 
 
 ### Document Processing
 
-- LaTeX-based templates — structured welfare form generation
-- jsPDF — PDF generation and processing
-- JSZip — document packaging into downloadable archives
+- LaTeX-based templates 
+- jsPDF 
+- JSZip 
 
 ### Deployment
 
-- Vercel — application hosting and deployment
-- Spaceship — custom domain registration and management
+- Vercel
+- Spaceship
 
 ## My Contribution
 
-As the team leader of a Top 8 finalist project in GDGoC Hackathon 2026 — Build with Agentic AI, I mainly contributed to the product design, system architecture, and AI workflow development of BridgeCare.
+As the team leader of the Top 8 finalist project in GDGoC Hackathon 2026 — Build with Agentic AI, I led the product design and AI workflow development of BridgeCare.
 
 My responsibilities included:
 
@@ -154,4 +154,8 @@ Welfare applications may involve sensitive personal information. Future improvem
 ### Offline Application Support
 
 Currently, BridgeCare mainly focuses on digital assistance and document preparation. Future extensions could integrate service location information, appointment availability checking, and additional offline procedure support.
+
+### AI Evaluation
+
+The current prototype focuses on functional validation rather than large-scale evaluation. Future work could introduce benchmark datasets and systematic evaluation metrics to measure recommendation accuracy and response quality.
 
