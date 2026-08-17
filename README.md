@@ -43,3 +43,25 @@ The system provides a journey dashboard that helps users organize application st
 BridgeCare follows an AI-agent architecture that integrates conversational interaction, information retrieval, document generation, and workflow management.
 
 <img width="596" height="640" alt="image" src="https://github.com/user-attachments/assets/b7e06ca7-971e-44c3-8043-3e9dcc1eef70" />
+
+### Frontend Layer
+
+The React-based frontend provides the user interface for conversational interaction, dynamic information collection, document preparation, and application progress tracking.
+
+### AI Agent Layer
+
+The AI agent processes user inputs through natural language understanding, identifies user needs, and generates responses based on retrieved information and collected user data.
+
+### Information Retrieval Layer
+
+BridgeCare integrates Exa Search API to retrieve relevant welfare-related information and provide users with supporting resources.
+
+### Document Generation Layer
+
+The system generates pre-filled application documents and packages required files into downloadable archives to simplify manual preparation.
+
+### Workflow Management Layer
+
+The application journey module manages user progress, tracks completed steps, and organizes the welfare application workflow.
+
+
