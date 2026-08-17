@@ -1,5 +1,9 @@
 # BridgeCare — AI Agent for Social Welfare Assistance
 
+> Top 8 Finalist, GDGoC Hackathon 2026 — Build with Agentic AI
+
+
+
 BridgeCare is an AI-powered assistant designed to help Hong Kong residents better understand and access social welfare services.
 
 By allowing users to describe their situations through natural language conversations, BridgeCare analyzes user needs, recommends suitable welfare programs, provides document preparation guidance, generates pre-filled application documents, and supports the overall application journey.
@@ -117,4 +121,37 @@ The journey dashboard helps users organize application steps, monitor progress, 
 - Vercel — application hosting and deployment
 - Spaceship — custom domain registration and management
 
+## My Contribution
+
+As the team leader of a Top 8 finalist project in GDGoC Hackathon 2026 — Build with Agentic AI, I mainly contributed to the product design, system architecture, and AI workflow development of BridgeCare.
+
+My responsibilities included:
+
+- Designed the overall product concept and end-to-end welfare assistance workflow, including the five-step user journey from discovery to application tracking.
+- Designed the AI agent interaction logic, including information collection, welfare recommendation, document preparation, and workflow transitions.
+- Refined prompts and tested AI behaviors to improve the usability and reliability of the prototype.
+- Coordinated team development and collaborated with my teammate to deliver the final project presentation.
+  
+
+## Limitations & Future Improvements
+
+### Reliable Welfare Information Sources
+
+The current prototype relies on external search services for welfare-related information retrieval. Future improvements include integrating verified government data sources or official APIs to improve information reliability and reduce misinformation risks.
+
+### AI Accuracy and Evaluation
+
+As the system relies on large language models for user interaction and recommendation, further evaluation is required to improve response reliability. Future work could explore stronger retrieval-augmented generation pipelines and systematic evaluation methods.
+
+### User Testing and Accessibility
+
+The current prototype has not yet been extensively tested with real welfare applicants. Future development could involve user studies with target communities to improve accessibility and usability.
+
+### Privacy and Security
+
+Welfare applications may involve sensitive personal information. Future improvements should focus on stronger privacy protection, secure data handling, and compliance with relevant data protection requirements.
+
+### Offline Application Support
+
+Currently, BridgeCare mainly focuses on digital assistance and document preparation. Future extensions could integrate service location information, appointment availability checking, and additional offline procedure support.
 
