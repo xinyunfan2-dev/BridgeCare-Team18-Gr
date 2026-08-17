@@ -292,3 +292,12 @@ Currently, BridgeCare mainly focuses on digital assistance and document preparat
 
 The current prototype focuses on functional validation rather than large-scale evaluation. Future work could introduce benchmark datasets and systematic evaluation metrics to measure recommendation accuracy and response quality.
 
+
+## Quick Start
+
+### Live Demo
+
+The deployed prototype is available here:
+
+[BridgeCare — AI Agent for Social Welfare Assistance](https://bridgecare-blue.vercel.app/)
+
